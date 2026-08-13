@@ -24,12 +24,23 @@
             <div>
               <h1 id="page-title">Prompt Activity</h1>
               <p>Tracking your daily prompting habit.</p>
+              <p class="daily-insight">
+                <span class="insight-spark" aria-hidden="true">✦</span>
+                <strong>Daily insight</strong>
+                <span id="daily-insight">Reading your trail…</span>
+              </p>
             </div>
           </div>
-          <a class="history-link" href="#history">
-            History
-            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"></path></svg>
-          </a>
+          <div class="header-actions">
+            <button id="share-button" class="share-button" type="button" disabled hidden>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 13V3m0 0L6 7m4-4 4 4M4 11v5h12v-5"></path></svg>
+              <span>Share</span>
+            </button>
+            <a class="history-link" href="#history">
+              History
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"></path></svg>
+            </a>
+          </div>
         </header>
 
         <section class="stats" aria-label="Prompt statistics">
@@ -128,6 +139,8 @@
         <button id="load-more" class="load-more" type="button" hidden>Load more prompts</button>
       </section>
     </main>
+
+    <div id="share-status" class="share-status" role="status" aria-live="polite" hidden></div>
 
     <template id="prompt-template">
       <article class="prompt-card">
