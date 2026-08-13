@@ -1,8 +1,8 @@
-# Contributing to PromptTrail
+# Contributing to Prompt Contribution Graph
 
-Thank you for contributing to PromptTrail. This project welcomes focused fixes, documentation, tests, and features.
+Thank you for contributing to Prompt Contribution Graph. This project welcomes focused fixes, documentation, tests, and features.
 
-PromptTrail is local-first. Privacy and compatibility are requirements for every contribution.
+Prompt Contribution Graph is local-first. Privacy and compatibility are requirements for every contribution.
 
 ## Before you start
 
@@ -18,8 +18,8 @@ Do not put private prompts, responses, credentials, tokens, or customer data in 
 2. Clone your fork.
 
    ```bash
-   git clone https://github.com/YOUR-USER/prompttrail.git
-   cd prompttrail
+   git clone https://github.com/YOUR-USER/prompt-contribution-graph.git
+   cd prompt-contribution-graph
    ```
 
 3. Install the dependencies.

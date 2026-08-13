@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { DISPLAY_NAME } from './config.js';
 import { openDatabase } from './database.js';
 
 export async function readStandardInput(stream = process.stdin) {
@@ -82,7 +83,7 @@ export function saveHookEvent(event, options = {}) {
       });
     }
 
-    throw new Error(`PromptTrail does not support the ${event.hook_event_name} hook event.`);
+    throw new Error(`${DISPLAY_NAME} does not support the ${event.hook_event_name} hook event.`);
   } finally {
     if (ownsDatabase) database.close();
   }

@@ -17,10 +17,10 @@ export function normalizeCaptureRect(rect, bounds) {
 
 export function screenshotFileName(date = new Date()) {
   const timestamp = date.toISOString().replaceAll(':', '-').replace(/\.\d{3}Z$/, 'Z');
-  return `PromptTrail-activity-${timestamp}.png`;
+  return `Prompt-Contribution-Graph-activity-${timestamp}.png`;
 }
 
-export function buildXIntent(text, projectUrl = 'https://github.com/chintan-diwakar/prompttrail') {
+export function buildXIntent(text, projectUrl = 'https://github.com/chintan-diwakar/prompt-contribution-graph') {
   const url = new URL(X_INTENT_URL);
   url.searchParams.set('text', String(text || '').slice(0, 240));
   url.searchParams.set('url', projectUrl);

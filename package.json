@@ -1,18 +1,18 @@
 {
   "name": "prompttrail",
   "version": "0.2.0",
-  "description": "A local-first prompt history and contribution dashboard for Claude Code",
-  "homepage": "https://github.com/chintan-diwakar/prompttrail",
+  "description": "Track your daily prompt contributions across CLI coding agents",
+  "homepage": "https://github.com/chintan-diwakar/prompt-contribution-graph",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chintan-diwakar/prompttrail.git"
+    "url": "https://github.com/chintan-diwakar/prompt-contribution-graph.git"
   },
   "bugs": {
-    "url": "https://github.com/chintan-diwakar/prompttrail/issues"
+    "url": "https://github.com/chintan-diwakar/prompt-contribution-graph/issues"
   },
   "type": "module",
   "main": "desktop/main.js",
-  "desktopName": "PromptTrail",
+  "desktopName": "Prompt Contribution Graph",
   "author": {
     "name": "Chintan Diwakar",
     "email": "48587709+chintan-diwakar@users.noreply.github.com",
@@ -54,7 +54,7 @@
   ],
   "build": {
     "appId": "dev.prompttrail.app",
-    "productName": "PromptTrail",
+    "productName": "Prompt Contribution Graph",
     "asar": true,
     "npmRebuild": false,
     "directories": {
@@ -66,25 +66,25 @@
       "desktop/**/*",
       "package.json"
     ],
-    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "artifactName": "prompt-contribution-graph-${version}-${os}-${arch}.${ext}",
     "linux": {
       "target": [
         "AppImage",
         "deb"
       ],
       "category": "Utility",
-      "synopsis": "Private Claude Code prompt history",
-      "description": "A local prompt, response, and tool activity dashboard for Claude Code.",
+      "synopsis": "Daily prompt contributions for CLI coding agents",
+      "description": "A local prompt, response, and tool activity dashboard for CLI coding agents.",
       "maintainer": "Chintan Diwakar",
       "executableName": "prompttrail",
       "syncDesktopName": true,
       "desktop": {
         "entry": {
-          "Name": "PromptTrail",
-          "Comment": "Private Claude Code activity dashboard",
+          "Name": "Prompt Contribution Graph",
+          "Comment": "Daily prompt contributions for CLI coding agents",
           "Categories": "Utility;Development;",
-          "Keywords": "Claude;prompts;productivity;local;",
-          "StartupWMClass": "PromptTrail"
+          "Keywords": "Claude;coding agents;prompts;contributions;productivity;local;",
+          "StartupWMClass": "Prompt Contribution Graph"
         }
       }
     },
@@ -95,7 +95,7 @@
       "hardenedRuntime": false
     },
     "dmg": {
-      "title": "PromptTrail ${version}",
+      "title": "Prompt Contribution Graph ${version}",
       "backgroundColor": "#101210",
       "window": {
         "width": 540,

@@ -23,7 +23,7 @@ export function createDailyInsight(summary, now = new Date()) {
   const weeklyTotal = lastSevenDays.reduce((total, count) => total + count, 0);
 
   if (!summary.total) {
-    return 'Your trail is ready. One prompt starts today’s activity.';
+    return 'Your contribution graph is ready. One prompt starts today’s activity.';
   }
 
   if (!summary.today) {
@@ -33,7 +33,7 @@ export function createDailyInsight(summary, now = new Date()) {
     if (weeklyTotal) {
       return `A quiet day so far, after ${weeklyTotal} ${promptWord(weeklyTotal)} in the last seven days.`;
     }
-    return 'Your trail is quiet today. One prompt starts fresh momentum.';
+    return 'Your prompt activity is quiet today. One prompt starts fresh momentum.';
   }
 
   if (summary.currentStreak >= 2 && summary.currentStreak === summary.longestStreak) {
@@ -41,7 +41,7 @@ export function createDailyInsight(summary, now = new Date()) {
   }
 
   if (!yesterday) {
-    return `${summary.today} ${promptWord(summary.today)} today started a fresh trail.`;
+    return `${summary.today} ${promptWord(summary.today)} today started a fresh contribution streak.`;
   }
 
   if (summary.today > yesterday) {
@@ -59,8 +59,8 @@ export function createDailyInsight(summary, now = new Date()) {
 export function createShareText(summary, insight) {
   const streak = `${summary.currentStreak}-day streak`;
   return [
-    `My PromptTrail: ${summary.today} ${promptWord(summary.today)} today · ${streak} · ${summary.total} all time.`,
+    `My Prompt Contribution Graph: ${summary.today} ${promptWord(summary.today)} today · ${streak} · ${summary.total} all time.`,
     insight,
-    'Tracking my Claude Code momentum locally with PromptTrail.',
+    'Tracking my CLI coding-agent prompts locally with Prompt Contribution Graph.',
   ].join('\n\n');
 }
