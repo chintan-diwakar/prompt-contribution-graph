@@ -1,0 +1,43 @@
+{
+  "name": "prompttrail",
+  "version": "0.1.0",
+  "description": "A local-first prompt history and contribution dashboard for Claude Code",
+  "homepage": "https://github.com/chintan-diwakar/prompttrail",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chintan-diwakar/prompttrail.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chintan-diwakar/prompttrail/issues"
+  },
+  "type": "module",
+  "author": {
+    "name": "Chintan Diwakar",
+    "email": "48587709+chintan-diwakar@users.noreply.github.com",
+    "url": "https://github.com/chintan-diwakar"
+  },
+  "bin": {
+    "prompttrail": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node --no-warnings ./src/cli.js start",
+    "test": "node --no-warnings --test",
+    "check": "node --check ./src/cli.js && node --check ./src/server.js && node --check ./src/public/app.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "keywords": [
+    "claude-code",
+    "prompts",
+    "productivity",
+    "local-first",
+    "sqlite"
+  ],
+  "license": "MIT",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ]
+}

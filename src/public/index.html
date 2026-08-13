@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#101210">
+    <title>PromptTrail</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="PromptTrail home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" role="img">
+              <path d="M6 23.5c4.8 0 4.7-15 9.6-15s3.9 15 10.4 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="6" cy="23.5" r="2.2" fill="currentColor"/>
+              <circle cx="26" cy="23.5" r="2.2" fill="currentColor"/>
+            </svg>
+          </span>
+          <span>PromptTrail</span>
+        </a>
+        <div class="local-badge"><span></span> Local only</div>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">YOUR CLAUDE CODE ACTIVITY</p>
+          <h1 id="page-title">Build momentum,<br><em>one prompt at a time.</em></h1>
+        </div>
+        <p class="hero-copy">A private record of the questions, ideas, and instructions that moved your work forward.</p>
+      </section>
+
+      <section class="stats" aria-label="Prompt statistics">
+        <article class="stat-card stat-primary">
+          <p>Prompts today</p>
+          <strong id="today-count">—</strong>
+          <span id="today-note">Loading activity</span>
+        </article>
+        <article class="stat-card">
+          <p>Current streak</p>
+          <strong><span id="current-streak">—</span><small> days</small></strong>
+          <span>Keep the trail warm</span>
+        </article>
+        <article class="stat-card">
+          <p>Longest streak</p>
+          <strong><span id="longest-streak">—</span><small> days</small></strong>
+          <span>Your personal best</span>
+        </article>
+        <article class="stat-card">
+          <p>All-time prompts</p>
+          <strong id="total-count">—</strong>
+          <span>Stored on this device</span>
+        </article>
+      </section>
+
+      <section class="panel contribution-panel" aria-labelledby="activity-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">THE LAST YEAR</p>
+            <h2 id="activity-title">Contribution trail</h2>
+          </div>
+          <div class="legend" aria-label="Contribution intensity legend">
+            <span>Less</span><i class="level-0"></i><i class="level-1"></i><i class="level-2"></i><i class="level-3"></i><i class="level-4"></i><span>More</span>
+          </div>
+        </div>
+        <div class="chart-scroll">
+          <div id="month-labels" class="month-labels" aria-hidden="true"></div>
+          <div class="chart-layout">
+            <div class="day-labels" aria-hidden="true"><span>Mon</span><span>Wed</span><span>Fri</span></div>
+            <div id="heatmap" class="heatmap" role="img" aria-label="Daily prompt contribution chart"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel history-panel" aria-labelledby="history-title">
+        <div class="panel-heading history-heading">
+          <div>
+            <p class="eyebrow">THE ARCHIVE</p>
+            <h2 id="history-title">Prompt history</h2>
+          </div>
+          <p id="result-count" class="result-count"></p>
+        </div>
+
+        <form id="filters" class="filters" role="search">
+          <label class="search-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+            <span class="sr-only">Search prompts</span>
+            <input id="search" type="search" placeholder="Search your prompts…" autocomplete="off">
+          </label>
+          <label class="select-box">
+            <span class="sr-only">Filter by project</span>
+            <select id="project-filter"><option value="">All projects</option></select>
+          </label>
+        </form>
+
+        <div id="prompt-list" class="prompt-list" aria-live="polite">
+          <div class="loading-row">Loading your prompt trail…</div>
+        </div>
+        <button id="load-more" class="load-more" type="button" hidden>Load more prompts</button>
+      </section>
+
+      <footer>
+        <span>PromptTrail</span>
+        <p>Your prompts stay on this device. No account. No telemetry.</p>
+      </footer>
+    </main>
+    <template id="prompt-template">
+      <article class="prompt-card">
+        <div class="prompt-meta">
+          <span class="project-chip"></span>
+          <time></time>
+          <button class="delete-prompt" type="button" aria-label="Delete prompt" title="Delete prompt">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"></path></svg>
+          </button>
+        </div>
+        <div class="message-block prompt-block">
+          <p class="message-label">You</p>
+          <details class="prompt-details">
+            <summary class="prompt-summary"></summary>
+            <pre class="prompt-content"></pre>
+          </details>
+          <span class="prompt-expand">Open full prompt</span>
+        </div>
+        <div class="interaction-line" aria-hidden="true"><span></span></div>
+        <div class="message-block response-block">
+          <div class="response-heading">
+            <p class="message-label">Claude</p>
+            <span class="response-state"></span>
+          </div>
+          <details class="response-details">
+            <summary class="response-summary"></summary>
+            <pre class="response-content"></pre>
+          </details>
+          <span class="response-expand" hidden>Open full response</span>
+          <p class="response-empty">No response captured.</p>
+        </div>
+        <details class="tools-details">
+          <summary class="tools-summary">
+            <span class="tools-summary-text"></span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4"></path></svg>
+          </summary>
+          <div class="tool-list"></div>
+        </details>
+        <div class="prompt-foot">
+          <span class="session-id"></span>
+          <span class="turn-duration"></span>
+        </div>
+      </article>
+    </template>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
