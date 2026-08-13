@@ -14,6 +14,8 @@ All activity data stays on your device. PromptTrail has no account, external ser
 - Stores activity and session details in a local SQLite database.
 - Displays a 53-week contribution chart.
 - Calculates the current streak, longest streak, and prompt totals.
+- Displays one daily insight from your recent activity.
+- Captures a private activity screenshot for the system share menu.
 - Searches prompt and response text, then filters results by project.
 - Deletes complete interactions from the dashboard.
 - Preserves existing Claude Code hooks and settings.
@@ -34,6 +36,16 @@ The release workflow creates these desktop packages:
 The desktop application installs its Claude Code hooks on the first launch. It uses the same local database as the command-line dashboard.
 
 The current macOS packages do not have an Apple signature. macOS displays a security warning until a release uses signing and notarization.
+
+### Share an activity screenshot
+
+The **Share** button captures the activity screen. The screenshot does not contain prompt text, response text, project names, or tool details.
+
+On macOS, PromptTrail opens the system share menu. Select X, Messages, AirDrop, Mail, or another available service.
+
+On Linux and Windows, PromptTrail copies the screenshot and opens an X post window. Paste the screenshot into the post.
+
+PromptTrail also saves each screenshot in the `PromptTrail` folder in your Pictures directory.
 
 ## Install from this repository
 
@@ -129,6 +141,8 @@ Prompts and responses can contain source code, credentials, customer data, or ot
 
 PromptTrail does not store tool output. It does not store Bash command text or complete tool input.
 
+Shared activity screenshots contain only counts, streaks, the daily insight, and the contribution chart.
+
 The installer updates `~/.claude/settings.json`. It writes the previous file to `settings.json.prompttrail.bak` before each change.
 
 The uninstall command keeps the SQLite database. Delete the database file manually if you also want to delete all prompt history.
@@ -173,6 +187,7 @@ PROMPTTRAIL_HOME="$PWD/.prompttrail-data" npm start -- --no-open
 
 ## Planned work
 
+- Add a Codex hook adapter and installer.
 - Add optional prompt redaction rules.
 - Add JSON and CSV export.
 - Import existing Claude Code transcript files.

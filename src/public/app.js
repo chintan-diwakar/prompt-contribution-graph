@@ -1,9 +1,13 @@
+import { createDailyInsight, createShareText } from './insights.js';
+
 const state = {
   offset: 0,
   limit: 30,
   query: '',
   project: '',
   total: 0,
+  summary: null,
+  insight: '',
 };
 
 const shellParameters = new URLSearchParams(window.location.search);
@@ -27,6 +31,10 @@ const elements = {
   project: document.querySelector('#project-filter'),
   loadMore: document.querySelector('#load-more'),
   filters: document.querySelector('#filters'),
+  dailyInsight: document.querySelector('#daily-insight'),
+  shareButton: document.querySelector('#share-button'),
+  shareStatus: document.querySelector('#share-status'),
+  appFrame: document.querySelector('.app-frame'),
 };
 
 function localDateKey(date) {
@@ -231,12 +239,66 @@ async function loadSummary() {
   const response = await fetch('/api/summary?days=371');
   if (!response.ok) throw new Error('Could not load the activity summary.');
   const summary = await response.json();
+  const insight = createDailyInsight(summary);
+  state.summary = summary;
+  state.insight = insight;
   elements.today.textContent = summary.today.toLocaleString();
   elements.todayNote.textContent = summary.today === 1 ? 'One step forward' : summary.today ? 'The trail is growing' : 'Start a new trail today';
   elements.currentStreak.textContent = summary.currentStreak.toLocaleString();
   elements.longestStreak.textContent = summary.longestStreak.toLocaleString();
   elements.total.textContent = summary.total.toLocaleString();
+  elements.dailyInsight.textContent = insight;
+  elements.shareButton.disabled = false;
   renderHeatmap(summary.daily);
+}
+
+let shareStatusTimer;
+
+function showShareStatus(message, isError = false) {
+  clearTimeout(shareStatusTimer);
+  elements.shareStatus.textContent = message;
+  elements.shareStatus.classList.toggle('is-error', isError);
+  elements.shareStatus.hidden = false;
+  shareStatusTimer = setTimeout(() => { elements.shareStatus.hidden = true; }, 5_000);
+}
+
+function waitForPaint() {
+  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+}
+
+async function shareActivity() {
+  if (!state.summary || elements.shareButton.disabled) return;
+  elements.shareButton.disabled = true;
+  elements.shareButton.classList.add('is-sharing');
+  document.documentElement.dataset.capturing = 'true';
+
+  try {
+    await waitForPaint();
+    const bounds = elements.appFrame.getBoundingClientRect();
+    const payload = {
+      rect: { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },
+      text: createShareText(state.summary, state.insight),
+    };
+
+    if (window.promptTrailDesktop?.shareActivity) {
+      const result = await window.promptTrailDesktop.shareActivity(payload);
+      showShareStatus(result.mode === 'native'
+        ? 'Screenshot ready in the Mac share sheet.'
+        : 'Screenshot copied. Paste it into the X post window.');
+    } else {
+      const url = new URL('https://x.com/intent/tweet');
+      url.searchParams.set('text', payload.text.slice(0, 240));
+      url.searchParams.set('url', 'https://github.com/chintan-diwakar/prompttrail');
+      window.open(url, '_blank', 'noopener');
+      showShareStatus('X opened. Screenshot sharing requires the desktop app.');
+    }
+  } catch (error) {
+    showShareStatus(error?.message || 'PromptTrail could not create the screenshot.', true);
+  } finally {
+    delete document.documentElement.dataset.capturing;
+    elements.shareButton.disabled = false;
+    elements.shareButton.classList.remove('is-sharing');
+  }
 }
 
 async function loadProjects() {
@@ -301,6 +363,7 @@ elements.project.addEventListener('change', () => {
 
 elements.filters.addEventListener('submit', (event) => event.preventDefault());
 elements.loadMore.addEventListener('click', () => loadPrompts().catch(showError));
+elements.shareButton.addEventListener('click', shareActivity);
 
 function showError(error) {
   const message = document.createElement('div');
@@ -332,6 +395,8 @@ async function showCurrentView() {
 }
 
 window.addEventListener('hashchange', () => showCurrentView().catch(showError));
+
+if (shellParameters.get('desktop') === '1') elements.shareButton.hidden = false;
 
 loadSummary()
   .then(showCurrentView)

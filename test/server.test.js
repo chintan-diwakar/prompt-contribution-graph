@@ -25,6 +25,10 @@ test('serves the dashboard API and deletes a prompt', async (t) => {
   assert.match(markup, /href="#history"/);
   assert.match(markup, /href="#activity"/);
 
+  const insightsModule = await fetch(`${url}/insights.js`);
+  assert.equal(insightsModule.status, 200);
+  assert.match(await insightsModule.text(), /createDailyInsight/);
+
   const history = await fetch(`${url}/api/prompts?q=dashboard`).then((response) => response.json());
   assert.equal(history.total, 1);
   assert.equal(history.items[0].prompt, 'Hello dashboard');

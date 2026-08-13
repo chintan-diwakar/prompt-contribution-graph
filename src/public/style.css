@@ -77,6 +77,8 @@ h1, h2, p { margin-top: 0; }
   gap: 18px;
 }
 
+.title-lockup > div { min-width: 0; }
+
 .brand-mark {
   display: grid;
   width: 48px;
@@ -113,6 +115,58 @@ h1, h2 {
   color: var(--muted);
   font-size: 14px;
 }
+
+.activity-header .daily-insight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: #786a5e;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.daily-insight strong {
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.insight-spark {
+  color: var(--accent);
+  font-size: 10px;
+  animation: insight-pulse 2.4s ease-in-out infinite;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 9px;
+  color: #62564b;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 580;
+  transition: color .18s ease, background .18s ease, opacity .18s ease;
+}
+
+.share-button[hidden] { display: none; }
+.share-button:hover { color: var(--accent); background: var(--accent-pale); }
+.share-button:disabled { cursor: default; opacity: .46; }
+.share-button.is-sharing { color: var(--accent); }
+.share-button svg { width: 15px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
 
 .history-link,
 .back-link {
@@ -440,6 +494,30 @@ input:focus, select:focus { border-color: #df8b65; box-shadow: 0 0 0 3px rgba(21
 .load-more:hover { color: var(--accent); border-color: #dfb299; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 
+.share-status {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 30;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 11px 14px;
+  color: #fffaf5;
+  border-radius: 12px;
+  background: rgba(57, 46, 36, .94);
+  box-shadow: 0 12px 34px rgba(62, 42, 24, .22);
+  font-size: 11px;
+  animation: toast-in .24s ease-out both;
+}
+
+.share-status[hidden] { display: none; }
+.share-status.is-error { background: rgba(139, 49, 38, .96); }
+
+html[data-capturing] .header-actions,
+html[data-capturing] .share-status { visibility: hidden; }
+html[data-capturing] *,
+html[data-capturing] *::before,
+html[data-capturing] *::after { animation-play-state: paused !important; }
+
 @keyframes draw-trail { to { stroke-dashoffset: 0; } }
 @keyframes dot-in { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: scale(1); } }
 @keyframes card-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
@@ -447,6 +525,8 @@ input:focus, select:focus { border-color: #df8b65; box-shadow: 0 0 0 3px rgba(21
 @keyframes cell-in { to { opacity: 1; transform: scale(1); } }
 @keyframes slow-turn { to { transform: rotate(360deg); } }
 @keyframes grid-breathe { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+@keyframes insight-pulse { 0%, 100% { opacity: .48; transform: scale(.88); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes toast-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 920px) {
   .app-frame { padding: 30px; }
@@ -463,7 +543,9 @@ input:focus, select:focus { border-color: #df8b65; box-shadow: 0 0 0 3px rgba(21
   .brand-mark svg { width: 32px; }
   .activity-header h1 { font-size: 27px; }
   .activity-header p { font-size: 12px; }
-  .history-link { margin-top: 2px; }
+  .activity-header .daily-insight { align-items: flex-start; max-width: 245px; font-size: 10px; }
+  .header-actions { flex-direction: column; align-items: stretch; }
+  .share-button, .history-link { justify-content: flex-end; margin-top: 0; padding: 6px; font-size: 11px; }
   .stats { gap: 9px; }
   .stat-card { grid-template-columns: 34px 1fr; gap: 10px; min-height: 126px; padding: 15px; border-radius: 15px; }
   .stat-icon { width: 34px; height: 34px; border-radius: 10px; }
@@ -482,6 +564,7 @@ input:focus, select:focus { border-color: #df8b65; box-shadow: 0 0 0 3px rgba(21
   .prompt-card { padding: 16px; }
   .tool-row { grid-template-columns: 7px 65px minmax(0, 1fr); }
   .tool-duration { display: none; }
+  .share-status { right: 16px; bottom: 16px; }
 }
 
 @media (prefers-reduced-transparency: reduce) {
