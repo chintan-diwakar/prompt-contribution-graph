@@ -7,6 +7,8 @@ All activity data stays on your device. PromptTrail has no account, external ser
 > [!NOTE]
 > PromptTrail is an unofficial community project. It is not affiliated with Anthropic.
 
+![PromptTrail activity dashboard with daily insight, streaks, prompt totals, and a contribution chart](docs/prompttrail-activity.png)
+
 ## Features
 
 - Captures prompts and final responses through official Claude Code hooks.
