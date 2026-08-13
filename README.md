@@ -180,6 +180,7 @@ PROMPTTRAIL_HOME="$PWD/.prompttrail-data" npm start -- --no-open
 ## Planned work
 
 - Add a Codex hook adapter and installer.
+- [Migrate the desktop shell from Electron to Tauri](docs/TAURI_MIGRATION.md).
 - Add optional prompt redaction rules.
 - Add JSON and CSV export.
 - Import existing Claude Code transcript files.
