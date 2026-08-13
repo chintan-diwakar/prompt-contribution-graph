@@ -11,6 +11,8 @@ if (shellParameters.get('desktop') === '1') document.documentElement.dataset.she
 if (shellParameters.get('platform')) document.documentElement.dataset.platform = shellParameters.get('platform');
 
 const elements = {
+  activityView: document.querySelector('#activity-view'),
+  historyView: document.querySelector('#history-view'),
   today: document.querySelector('#today-count'),
   todayNote: document.querySelector('#today-note'),
   currentStreak: document.querySelector('#current-streak'),
@@ -65,6 +67,7 @@ function renderHeatmap(daily) {
     const count = countByDate.get(key) || 0;
     const cell = document.createElement('span');
     cell.className = `heatmap-cell level-${activityLevel(count)}`;
+    cell.style.animationDelay = `${Math.min(dayIndex * 0.0012, 0.38).toFixed(3)}s`;
     if (key > todayKey) cell.classList.add('future');
     cell.title = `${count} ${count === 1 ? 'prompt' : 'prompts'} on ${formatter.format(date)}`;
     cell.setAttribute('aria-label', cell.title);
@@ -306,4 +309,30 @@ function showError(error) {
   elements.list.replaceChildren(message);
 }
 
-Promise.all([loadSummary(), loadProjects(), loadPrompts({ reset: true })]).catch(showError);
+let historyLoaded = false;
+
+function animateView(view) {
+  view.classList.remove('is-entering');
+  requestAnimationFrame(() => view.classList.add('is-entering'));
+}
+
+async function showCurrentView() {
+  const showHistory = window.location.hash === '#history';
+  elements.activityView.hidden = showHistory;
+  elements.historyView.hidden = !showHistory;
+
+  const activeView = showHistory ? elements.historyView : elements.activityView;
+  animateView(activeView);
+
+  if (showHistory && !historyLoaded) {
+    elements.list.innerHTML = '<div class="loading-row">Loading your prompt history…</div>';
+    await Promise.all([loadProjects(), loadPrompts({ reset: true })]);
+    historyLoaded = true;
+  }
+}
+
+window.addEventListener('hashchange', () => showCurrentView().catch(showError));
+
+loadSummary()
+  .then(showCurrentView)
+  .catch(showError);

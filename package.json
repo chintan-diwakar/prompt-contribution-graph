@@ -1,6 +1,6 @@
 {
   "name": "prompttrail",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A local-first prompt history and contribution dashboard for Claude Code",
   "homepage": "https://github.com/chintan-diwakar/prompttrail",
   "repository": {
