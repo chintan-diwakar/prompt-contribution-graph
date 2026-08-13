@@ -16,10 +16,10 @@ test('keeps the screenshot rectangle inside the window', () => {
 test('creates a stable screenshot name and safe X intent', () => {
   assert.equal(
     screenshotFileName(new Date('2026-08-13T12:34:56.789Z')),
-    'PromptTrail-activity-2026-08-13T12-34-56Z.png',
+    'Prompt-Contribution-Graph-activity-2026-08-13T12-34-56Z.png',
   );
   const intent = new URL(buildXIntent('A'.repeat(300)));
   assert.equal(intent.origin + intent.pathname, 'https://x.com/intent/tweet');
   assert.equal(intent.searchParams.get('text').length, 240);
-  assert.equal(intent.searchParams.get('url'), 'https://github.com/chintan-diwakar/prompttrail');
+  assert.equal(intent.searchParams.get('url'), 'https://github.com/chintan-diwakar/prompt-contribution-graph');
 });

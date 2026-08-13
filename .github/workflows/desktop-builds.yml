@@ -42,7 +42,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
       - uses: actions/upload-artifact@v7
         with:
-          name: prompttrail-linux-x64
+          name: prompt-contribution-graph-linux-x64
           path: |
             release/*.AppImage
             release/*.deb
@@ -70,6 +70,6 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
       - uses: actions/upload-artifact@v7
         with:
-          name: prompttrail-macos-${{ matrix.arch }}
+          name: prompt-contribution-graph-macos-${{ matrix.arch }}
           path: release/*.dmg
           if-no-files-found: error

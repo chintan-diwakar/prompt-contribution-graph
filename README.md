@@ -1,13 +1,24 @@
-# PromptTrail
+<div align="center">
+  <img src="build/icon.svg" width="128" alt="Prompt Contribution Graph logo">
+  <h1>Prompt Contribution Graph</h1>
+  <p><em>Track your daily prompt contributions across CLI coding agents.</em></p>
 
-PromptTrail keeps a private history of your Claude Code activity. It displays prompts, final responses, and tool metadata in a local dashboard.
+  <p>
+    <a href="https://github.com/chintan-diwakar/prompt-contribution-graph/actions/workflows/desktop-builds.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/chintan-diwakar/prompt-contribution-graph/desktop-builds.yml?branch=main&amp;style=flat-square&amp;label=build"></a>
+    <a href="https://github.com/chintan-diwakar/prompt-contribution-graph/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/chintan-diwakar/prompt-contribution-graph?style=flat-square"></a>
+    <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-24292f?style=flat-square"></a>
+    <img alt="macOS and Linux" src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-24292f?style=flat-square">
+    <img alt="Local first" src="https://img.shields.io/badge/data-local--first-d95725?style=flat-square">
+  </p>
 
-All activity data stays on your device. PromptTrail has no account, external service, analytics, or telemetry.
+  <p><strong>GitHub tracks code commits. Prompt Contribution Graph tracks your contributions to coding agents.</strong></p>
+  <p>Prompts, final responses, and safe tool metadata. Stored locally. No account. No telemetry.</p>
+</div>
 
 > [!NOTE]
-> PromptTrail is an unofficial community project. It is not affiliated with Anthropic.
+> The current release supports Claude Code. Prompt Contribution Graph is an unofficial community project that is not affiliated with Anthropic.
 
-![PromptTrail activity dashboard with daily insight, streaks, prompt totals, and a contribution chart](docs/prompttrail-activity.png)
+![Prompt Contribution Graph dashboard with daily insight, streaks, prompt totals, and a contribution chart](docs/prompttrail-activity.png)
 
 ## Features
 
@@ -43,19 +54,19 @@ The current macOS packages do not have an Apple signature. macOS displays a secu
 
 The **Share** button captures the activity screen. The screenshot does not contain prompt text, response text, project names, or tool details.
 
-On macOS, PromptTrail opens the system share menu. Select X, Messages, AirDrop, Mail, or another available service.
+On macOS, Prompt Contribution Graph opens the system share menu. Select X, Messages, AirDrop, Mail, or another available service.
 
-On Linux and Windows, PromptTrail copies the screenshot and opens an X post window. Paste the screenshot into the post.
+On Linux and Windows, Prompt Contribution Graph copies the screenshot and opens an X post window. Paste the screenshot into the post.
 
-PromptTrail also saves each screenshot in the `PromptTrail` folder in your Pictures directory.
+Prompt Contribution Graph also saves each screenshot in the `Prompt Contribution Graph` folder in your Pictures directory.
 
 ## Install from this repository
 
 1. Clone this repository.
 
    ```bash
-   git clone https://github.com/chintan-diwakar/prompttrail.git
-   cd prompttrail
+   git clone https://github.com/chintan-diwakar/prompt-contribution-graph.git
+   cd prompt-contribution-graph
    ```
 
 2. Link the `prompttrail` command.
@@ -76,7 +87,7 @@ PromptTrail also saves each screenshot in the `PromptTrail` folder in your Pictu
    prompttrail start
    ```
 
-PromptTrail opens `http://127.0.0.1:4317` in your browser. Submit a new Claude Code prompt to add the first entry.
+Prompt Contribution Graph opens `http://127.0.0.1:4317` in your browser. Submit a new Claude Code prompt to add the first entry.
 
 ## Commands
 
@@ -87,19 +98,19 @@ PromptTrail opens `http://127.0.0.1:4317` in your browser. Submit a new Claude C
 | `prompttrail start --no-open` | Starts the dashboard without browser launch. |
 | `prompttrail start --port 8080` | Starts the dashboard on a different port. |
 | `prompttrail status` | Displays the hook state, prompt count, and database path. |
-| `prompttrail uninstall` | Removes only the PromptTrail hooks. |
+| `prompttrail uninstall` | Removes only the Prompt Contribution Graph hooks. |
 
 ## How it works
 
-Claude Code sends lifecycle events to the configured hooks. PromptTrail writes each event to SQLite and returns immediately.
+Claude Code sends lifecycle events to the configured hooks. Prompt Contribution Graph writes each event to SQLite and returns immediately.
 
-![PromptTrail system design from Claude Code hooks to the local dashboard](docs/prompttrail-system-design.png)
+![Prompt Contribution Graph system design from Claude Code hooks to the local dashboard](docs/prompttrail-system-design.png)
 
 [Open the editable Excalidraw source](docs/prompttrail-system-design.excalidraw).
 
 The dashboard server accepts connections only from your device. A failed capture does not stop Claude Code from processing the prompt.
 
-PromptTrail records these fields:
+Prompt Contribution Graph records these fields:
 
 - Prompt text
 - Submission time
@@ -113,7 +124,7 @@ PromptTrail records these fields:
 
 ## Data location
 
-PromptTrail uses the standard data directory for each operating system.
+Prompt Contribution Graph uses the standard data directory for each operating system.
 
 | Operating system | Default database path |
 | --- | --- |
@@ -127,11 +138,13 @@ Set `PROMPTTRAIL_HOME` to use a different directory.
 PROMPTTRAIL_HOME=/private/prompt-data prompttrail start
 ```
 
+The project keeps the `prompttrail` command, environment variable, hook marker, application ID, and data paths for compatibility.
+
 ## Privacy
 
 Prompts and responses can contain source code, credentials, customer data, or other private text. Review the content before you share the database.
 
-PromptTrail does not store tool output. It does not store Bash command text or complete tool input.
+Prompt Contribution Graph does not store tool output. It does not store Bash command text or complete tool input.
 
 Shared activity screenshots contain only counts, streaks, the daily insight, and the contribution chart.
 
@@ -192,4 +205,4 @@ Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before you cr
 
 ## License
 
-PromptTrail uses the [MIT License](LICENSE).
+Prompt Contribution Graph uses the [MIT License](LICENSE).

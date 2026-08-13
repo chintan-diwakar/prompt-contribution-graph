@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
-import { DEFAULT_PORT, getDatabasePath } from './config.js';
+import { DEFAULT_PORT, DISPLAY_NAME, getDatabasePath } from './config.js';
 import { getHookStatus, installHook, uninstallHook } from './hooks.js';
 
-const HELP = `PromptTrail — local prompt history for Claude Code
+const HELP = `${DISPLAY_NAME} — local prompt history for Claude Code
 
 Usage:
   prompttrail install              Install the Claude Code hook
   prompttrail start [--port 4317]  Start the local dashboard
   prompttrail status               Show the hook and database status
-  prompttrail uninstall            Remove only the PromptTrail hook
+  prompttrail uninstall            Remove only the ${DISPLAY_NAME} hook
   prompttrail help                 Show this help
 `;
 
@@ -52,7 +52,7 @@ async function main() {
       const { captureFromStandardInput } = await importDatabaseModule('./capture.js');
       await captureFromStandardInput();
     } catch (error) {
-      process.stderr.write(`PromptTrail capture error: ${error.message}\n`);
+      process.stderr.write(`${DISPLAY_NAME} capture error: ${error.message}\n`);
     }
     process.stdout.write('{}');
     return;
@@ -60,7 +60,7 @@ async function main() {
 
   if (command === 'install') {
     const result = installHook();
-    console.log(result.changed ? 'PromptTrail installed the Claude Code hooks.' : 'The PromptTrail hooks are already installed.');
+    console.log(result.changed ? `${DISPLAY_NAME} installed the Claude Code hooks.` : `The ${DISPLAY_NAME} hooks are already installed.`);
     console.log(`Settings: ${result.settingsPath}`);
     console.log('Run `prompttrail start` to open the dashboard.');
     return;
@@ -68,7 +68,7 @@ async function main() {
 
   if (command === 'uninstall') {
     const result = uninstallHook();
-    console.log(result.changed ? 'PromptTrail removed the Claude Code hooks.' : 'The PromptTrail hooks are not installed.');
+    console.log(result.changed ? `${DISPLAY_NAME} removed the Claude Code hooks.` : `The ${DISPLAY_NAME} hooks are not installed.`);
     console.log('Your prompt database was not deleted.');
     return;
   }
@@ -90,7 +90,7 @@ async function main() {
     const { startServer } = await importDatabaseModule('./server.js');
     const port = Number(argumentValue(argumentsList, '--port', DEFAULT_PORT));
     const { url } = await startServer({ port });
-    console.log(`PromptTrail is available at ${url}`);
+    console.log(`${DISPLAY_NAME} is available at ${url}`);
     console.log('Press Ctrl+C to stop it.');
     if (!argumentsList.includes('--no-open')) openBrowser(url);
     return;
@@ -105,6 +105,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  process.stderr.write(`PromptTrail error: ${error.message}\n`);
+  process.stderr.write(`${DISPLAY_NAME} error: ${error.message}\n`);
   process.exitCode = 1;
 });

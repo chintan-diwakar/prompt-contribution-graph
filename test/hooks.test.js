@@ -36,7 +36,7 @@ test('installs one hook and preserves existing Claude settings', (t) => {
   assert.equal(fs.existsSync(`${settingsPath}.prompttrail.bak`), true);
 });
 
-test('uninstalls only the marked PromptTrail hook', (t) => {
+test('uninstalls only the marked Prompt Contribution Graph hook', (t) => {
   const settingsPath = temporarySettings(t, {
     hooks: {
       UserPromptSubmit: [
@@ -68,6 +68,24 @@ test('upgrades a prompt-only installation with response and tool hooks', (t) => 
   assert.deepEqual(status.missingEvents, []);
 });
 
+test('updates marked hook commands after an application rename', (t) => {
+  const oldCommand = "'/Applications/PromptTrail.app/Contents/MacOS/PromptTrail' --capture-hook --hook-id prompttrail-local-v1";
+  const newCommand = "'/Applications/Prompt Contribution Graph.app/Contents/MacOS/Prompt Contribution Graph' --capture-hook --hook-id prompttrail-local-v1";
+  const hooks = Object.fromEntries(HOOK_EVENTS.map((event) => [
+    event,
+    [{ matcher: '', hooks: [{ type: 'command', command: oldCommand, timeout: 5 }] }],
+  ]));
+  const settingsPath = temporarySettings(t, { permissions: { allow: ['Read'] }, hooks });
+
+  assert.equal(installHook({ settingsPath, command: newCommand }).changed, true);
+  const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  assert.deepEqual(settings.permissions, { allow: ['Read'] });
+  for (const event of HOOK_EVENTS) {
+    assert.equal(settings.hooks[event][0].hooks[0].command, newCommand);
+  }
+  assert.equal(installHook({ settingsPath, command: newCommand }).changed, false);
+});
+
 test('quotes paths in the generated hook command', () => {
   const command = createHookCommand({
     nodePath: '/path with space/node',
@@ -80,8 +98,8 @@ test('quotes paths in the generated hook command', () => {
 
 test('creates a packaged desktop hook command', () => {
   const command = createDesktopHookCommand({
-    executablePath: '/Applications/Prompt Trail.app/Contents/MacOS/PromptTrail',
+    executablePath: '/Applications/Prompt Contribution Graph.app/Contents/MacOS/Prompt Contribution Graph',
     platform: 'darwin',
   });
-  assert.equal(command, "'/Applications/Prompt Trail.app/Contents/MacOS/PromptTrail' --capture-hook --hook-id prompttrail-local-v1");
+  assert.equal(command, "'/Applications/Prompt Contribution Graph.app/Contents/MacOS/Prompt Contribution Graph' --capture-hook --hook-id prompttrail-local-v1");
 });

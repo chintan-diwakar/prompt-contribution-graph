@@ -227,7 +227,7 @@ function createPromptCard(prompt) {
     const response = await fetch(`/api/prompts/${encodeURIComponent(prompt.id)}`, { method: 'DELETE' });
     if (!response.ok) {
       deleteButton.disabled = false;
-      window.alert('PromptTrail could not delete this prompt.');
+      window.alert('Prompt Contribution Graph could not delete this prompt.');
       return;
     }
     await Promise.all([loadSummary(), loadProjects(), loadPrompts({ reset: true })]);
@@ -243,7 +243,7 @@ async function loadSummary() {
   state.summary = summary;
   state.insight = insight;
   elements.today.textContent = summary.today.toLocaleString();
-  elements.todayNote.textContent = summary.today === 1 ? 'One step forward' : summary.today ? 'The trail is growing' : 'Start a new trail today';
+  elements.todayNote.textContent = summary.today === 1 ? 'One contribution today' : summary.today ? 'Contributions are growing' : 'Start contributing today';
   elements.currentStreak.textContent = summary.currentStreak.toLocaleString();
   elements.longestStreak.textContent = summary.longestStreak.toLocaleString();
   elements.total.textContent = summary.total.toLocaleString();
@@ -288,12 +288,12 @@ async function shareActivity() {
     } else {
       const url = new URL('https://x.com/intent/tweet');
       url.searchParams.set('text', payload.text.slice(0, 240));
-      url.searchParams.set('url', 'https://github.com/chintan-diwakar/prompttrail');
+      url.searchParams.set('url', 'https://github.com/chintan-diwakar/prompt-contribution-graph');
       window.open(url, '_blank', 'noopener');
       showShareStatus('X opened. Screenshot sharing requires the desktop app.');
     }
   } catch (error) {
-    showShareStatus(error?.message || 'PromptTrail could not create the screenshot.', true);
+    showShareStatus(error?.message || 'Prompt Contribution Graph could not create the screenshot.', true);
   } finally {
     delete document.documentElement.dataset.capturing;
     elements.shareButton.disabled = false;
@@ -316,7 +316,7 @@ async function loadProjects() {
 async function loadPrompts({ reset = false } = {}) {
   if (reset) {
     state.offset = 0;
-    elements.list.innerHTML = '<div class="loading-row">Loading your prompt trail…</div>';
+    elements.list.innerHTML = '<div class="loading-row">Loading your prompt history…</div>';
   }
   const parameters = new URLSearchParams({
     limit: String(state.limit),
@@ -340,7 +340,7 @@ async function loadPrompts({ reset = false } = {}) {
     empty.className = 'empty-row';
     empty.textContent = state.query || state.project
       ? 'No prompts match these filters.'
-      : 'No prompts yet. Submit a prompt in Claude Code to start your trail.';
+      : 'No prompts yet. Submit a prompt in Claude Code to start your contribution graph.';
     elements.list.append(empty);
   }
   elements.resultCount.textContent = `${state.total.toLocaleString()} ${state.total === 1 ? 'prompt' : 'prompts'}`;

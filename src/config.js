@@ -1,9 +1,10 @@
 import os from 'node:os';
 import path from 'node:path';
 
-export const APP_NAME = 'PromptTrail';
+export const DISPLAY_NAME = 'Prompt Contribution Graph';
 export const HOOK_ID = 'prompttrail-local-v1';
 export const DEFAULT_PORT = 4317;
+const LEGACY_DATA_DIRECTORY_NAME = 'PromptTrail';
 
 export function getDataDirectory(env = process.env, platform = process.platform) {
   if (env.PROMPTTRAIL_HOME) {
@@ -11,11 +12,11 @@ export function getDataDirectory(env = process.env, platform = process.platform)
   }
 
   if (platform === 'win32') {
-    return path.join(env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), APP_NAME);
+    return path.join(env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), LEGACY_DATA_DIRECTORY_NAME);
   }
 
   if (platform === 'darwin') {
-    return path.join(os.homedir(), 'Library', 'Application Support', APP_NAME);
+    return path.join(os.homedir(), 'Library', 'Application Support', LEGACY_DATA_DIRECTORY_NAME);
   }
 
   return path.join(env.XDG_DATA_HOME || path.join(os.homedir(), '.local', 'share'), 'prompttrail');

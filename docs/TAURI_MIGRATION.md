@@ -6,15 +6,17 @@ Target release: Not scheduled
 
 This document defines a future migration from Electron to Tauri 2. The migration is not part of the current release.
 
+The public project name changed from PromptTrail to Prompt Contribution Graph. Legacy identifiers will remain during this migration to preserve existing installations.
+
 ## Why migrate
 
-PromptTrail packages a complete Electron runtime. Electron includes Chromium and Node.js with every desktop application.
+Prompt Contribution Graph packages a complete Electron runtime. Electron includes Chromium and Node.js with every desktop application.
 
-The PromptTrail application code is small. The runtime accounts for almost all package size.
+The Prompt Contribution Graph application code is small. The runtime accounts for almost all package size.
 
 | v0.2.0 Linux artifact | Measured size |
 | --- | ---: |
-| PromptTrail `app.asar` | 87,904 bytes |
+| Prompt Contribution Graph `app.asar` | 87,904 bytes |
 | Unpacked Electron application | 313 MB |
 | AppImage | 127.7 MB |
 | Ubuntu `.deb` | 100.3 MB |
@@ -101,7 +103,7 @@ If `--capture-hook` is present, the executable will use this sequence:
 
 The capture path will never write prompt content to a log. An error will not stop the provider from processing the prompt.
 
-Hook installation will continue to use an explicit PromptTrail marker. Uninstallation will remove only PromptTrail entries.
+Hook installation will continue to use the legacy `prompttrail` marker. Uninstallation will remove only marked entries.
 
 ### Tauri desktop
 
@@ -263,7 +265,7 @@ The project will keep the last Electron release available during the first two T
 
 If a critical error occurs, users can reinstall the Electron release. It will open the same database without conversion.
 
-The hook installer will keep its settings backup. A rollback will restore only PromptTrail hook entries.
+The hook installer will keep its settings backup. A rollback will restore only marked Prompt Contribution Graph hook entries.
 
 No stable Tauri release will delete an old column or table during the rollback window.
 

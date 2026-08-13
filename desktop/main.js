@@ -3,12 +3,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, clipboard, ipcMain, Menu, ShareMenu, shell } from 'electron';
 import { captureFromStandardInput } from '../src/capture.js';
+import { DISPLAY_NAME } from '../src/config.js';
 import { createDesktopHookCommand, installHook } from '../src/hooks.js';
 import { startServer } from '../src/server.js';
 import { buildXIntent, normalizeCaptureRect, screenshotFileName } from './share-utils.js';
 
 const desktopDirectory = path.dirname(fileURLToPath(import.meta.url));
-const projectUrl = 'https://github.com/chintan-diwakar/prompttrail';
+const projectUrl = 'https://github.com/chintan-diwakar/prompt-contribution-graph';
 
 const captureMode = process.argv.includes('--capture-hook');
 
@@ -16,7 +17,7 @@ if (captureMode) {
   try {
     await captureFromStandardInput();
   } catch (error) {
-    process.stderr.write(`PromptTrail capture error: ${error.message}\n`);
+    process.stderr.write(`${DISPLAY_NAME} capture error: ${error.message}\n`);
   }
   process.stdout.write('{}');
   process.exit(0);
@@ -29,20 +30,20 @@ let isQuitting = false;
 let activeShareMenu;
 
 function safeShareText(value) {
-  return String(value || 'My Claude Code activity with PromptTrail.').slice(0, 500);
+  return String(value || `My coding-agent activity with ${DISPLAY_NAME}.`).slice(0, 500);
 }
 
 async function shareActivity(event, payload = {}) {
   const owner = BrowserWindow.fromWebContents(event.sender);
   if (!owner || owner !== mainWindow || !event.sender.getURL().startsWith(dashboardUrl)) {
-    throw new Error('PromptTrail rejected an unknown share request.');
+    throw new Error(`${DISPLAY_NAME} rejected an unknown share request.`);
   }
 
   const rect = normalizeCaptureRect(payload.rect, owner.getContentBounds());
   const image = await event.sender.capturePage(rect);
-  if (image.isEmpty()) throw new Error('PromptTrail could not capture the activity screen.');
+  if (image.isEmpty()) throw new Error(`${DISPLAY_NAME} could not capture the activity screen.`);
 
-  const directory = path.join(app.getPath('pictures'), 'PromptTrail');
+  const directory = path.join(app.getPath('pictures'), DISPLAY_NAME);
   await fs.promises.mkdir(directory, { recursive: true, mode: 0o700 });
   const filePath = path.join(directory, screenshotFileName());
   await fs.promises.writeFile(filePath, image.toPNG(), { mode: 0o600 });
@@ -102,7 +103,7 @@ function createWindow() {
     minWidth: 720,
     minHeight: 560,
     show: false,
-    title: 'PromptTrail',
+    title: DISPLAY_NAME,
     backgroundColor: process.platform === 'darwin' ? '#00000000' : '#f0ebe2',
     transparent: process.platform === 'darwin',
     vibrancy: process.platform === 'darwin' ? 'under-window' : undefined,
@@ -141,7 +142,7 @@ if (!hasLock) {
   });
 
   app.whenReady().then(async () => {
-    app.setName('PromptTrail');
+    app.setName(DISPLAY_NAME);
     ipcMain.handle('prompttrail:share-activity', shareActivity);
     createApplicationMenu();
     const started = await startServer({ port: 0 });
@@ -153,7 +154,7 @@ if (!hasLock) {
       try {
         installHook({ command: createDesktopHookCommand({ executablePath }) });
       } catch (error) {
-        process.stderr.write(`PromptTrail hook install error: ${error.message}\n`);
+        process.stderr.write(`${DISPLAY_NAME} hook install error: ${error.message}\n`);
       }
     }
     createWindow();
@@ -162,7 +163,7 @@ if (!hasLock) {
       if (!BrowserWindow.getAllWindows().length) createWindow();
     });
   }).catch((error) => {
-    process.stderr.write(`PromptTrail desktop error: ${error.message}\n`);
+    process.stderr.write(`${DISPLAY_NAME} desktop error: ${error.message}\n`);
     app.quit();
   });
 }

@@ -20,7 +20,7 @@ function summary(overrides = {}) {
 
 test('creates a useful daily insight for each activity state', () => {
   assert.equal(createDailyInsight(summary({ total: 0, today: 0, currentStreak: 0, longestStreak: 0, daily: [] }), now),
-    'Your trail is ready. One prompt starts today’s activity.');
+    'Your contribution graph is ready. One prompt starts today’s activity.');
   assert.equal(createDailyInsight(summary({ today: 0, currentStreak: 3, daily: [{ date: '2026-08-12', count: 2 }] }), now),
     'One prompt today keeps your 3-day streak alive.');
   assert.equal(createDailyInsight(summary({ currentStreak: 5, longestStreak: 5 }), now),

@@ -73,8 +73,18 @@ export function installHook(options = {}) {
   const command = options.command || createHookCommand(options);
   for (const event of HOOK_EVENTS) {
     settings.hooks[event] ||= [];
-    const isInstalled = settings.hooks[event].some((group) =>
-      Array.isArray(group?.hooks) && group.hooks.some(isPromptTrailHook));
+    let isInstalled = false;
+    for (const group of settings.hooks[event]) {
+      if (!Array.isArray(group?.hooks)) continue;
+      for (const hook of group.hooks) {
+        if (!isPromptTrailHook(hook)) continue;
+        isInstalled = true;
+        if (hook.command !== command) {
+          hook.command = command;
+          changed = true;
+        }
+      }
+    }
     if (isInstalled) continue;
     settings.hooks[event].push({
       matcher: '',
