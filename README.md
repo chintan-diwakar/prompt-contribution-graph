@@ -93,19 +93,9 @@ PromptTrail opens `http://127.0.0.1:4317` in your browser. Submit a new Claude C
 
 Claude Code sends lifecycle events to the configured hooks. PromptTrail writes each event to SQLite and returns immediately.
 
-```text
-Claude Code hooks
-    │
-    ├── UserPromptSubmit ──► prompt
-    ├── Stop ──────────────► final response
-    └── PostToolUse ───────► safe tool metadata
-                                  │
-                                  ▼
-                         local SQLite database
-                                  ▲
-                                  │
-Browser dashboard ◄──── local server on 127.0.0.1
-```
+![PromptTrail system design from Claude Code hooks to the local dashboard](docs/prompttrail-system-design.png)
+
+[Open the editable Excalidraw source](docs/prompttrail-system-design.excalidraw).
 
 The dashboard server accepts connections only from your device. A failed capture does not stop Claude Code from processing the prompt.
 
