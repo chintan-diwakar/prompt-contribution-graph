@@ -195,6 +195,10 @@ PROMPTTRAIL_HOME="$PWD/.prompttrail-data" npm start -- --no-open
 - Import existing Claude Code transcript files.
 - Add labels and favorites.
 
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before you create a pull request.
+
 ## License
 
 PromptTrail uses the [MIT License](LICENSE).
