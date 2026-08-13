@@ -1,6 +1,6 @@
 {
   "name": "prompttrail",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A local-first prompt history and contribution dashboard for Claude Code",
   "homepage": "https://github.com/chintan-diwakar/prompttrail",
   "repository": {
@@ -28,7 +28,7 @@
     "build:linux": "electron-builder --linux AppImage deb --publish never",
     "build:mac": "electron-builder --mac dmg --publish never",
     "test": "node --no-warnings --test",
-    "check": "node --check ./src/cli.js && node --check ./src/server.js && node --check ./src/public/app.js && node --check ./desktop/main.js"
+    "check": "node --check ./src/cli.js && node --check ./src/server.js && node --check ./src/public/app.js && node --check ./src/public/insights.js && node --check ./desktop/main.js && node --check ./desktop/preload.cjs && node --check ./desktop/share-utils.js"
   },
   "engines": {
     "node": ">=22.5.0"
