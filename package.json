@@ -11,6 +11,8 @@
     "url": "https://github.com/chintan-diwakar/prompttrail/issues"
   },
   "type": "module",
+  "main": "desktop/main.js",
+  "desktopName": "PromptTrail",
   "author": {
     "name": "Chintan Diwakar",
     "email": "48587709+chintan-diwakar@users.noreply.github.com",
@@ -21,8 +23,12 @@
   },
   "scripts": {
     "start": "node --no-warnings ./src/cli.js start",
+    "desktop": "electron .",
+    "desktop:pack": "electron-builder --dir",
+    "build:linux": "electron-builder --linux AppImage deb",
+    "build:mac": "electron-builder --mac dmg",
     "test": "node --no-warnings --test",
-    "check": "node --check ./src/cli.js && node --check ./src/server.js && node --check ./src/public/app.js"
+    "check": "node --check ./src/cli.js && node --check ./src/server.js && node --check ./src/public/app.js && node --check ./desktop/main.js"
   },
   "engines": {
     "node": ">=22.5.0"
@@ -35,9 +41,79 @@
     "sqlite"
   ],
   "license": "MIT",
+  "devDependencies": {
+    "electron": "43.4.0",
+    "electron-builder": "26.15.3"
+  },
   "files": [
     "src",
+    "desktop",
+    "build",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "build": {
+    "appId": "dev.prompttrail.app",
+    "productName": "PromptTrail",
+    "asar": true,
+    "npmRebuild": false,
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "desktop/**/*",
+      "package.json"
+    ],
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility",
+      "synopsis": "Private Claude Code prompt history",
+      "description": "A local prompt, response, and tool activity dashboard for Claude Code.",
+      "maintainer": "Chintan Diwakar",
+      "executableName": "prompttrail",
+      "syncDesktopName": true,
+      "desktop": {
+        "entry": {
+          "Name": "PromptTrail",
+          "Comment": "Private Claude Code activity dashboard",
+          "Categories": "Utility;Development;",
+          "Keywords": "Claude;prompts;productivity;local;",
+          "StartupWMClass": "PromptTrail"
+        }
+      }
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.developer-tools",
+      "identity": null,
+      "hardenedRuntime": false
+    },
+    "dmg": {
+      "title": "PromptTrail ${version}",
+      "backgroundColor": "#101210",
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 140,
+          "y": 190,
+          "type": "file"
+        },
+        {
+          "x": 400,
+          "y": 190,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    }
+  }
 }

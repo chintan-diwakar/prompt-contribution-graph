@@ -6,6 +6,10 @@ const state = {
   total: 0,
 };
 
+const shellParameters = new URLSearchParams(window.location.search);
+if (shellParameters.get('desktop') === '1') document.documentElement.dataset.shell = 'desktop';
+if (shellParameters.get('platform')) document.documentElement.dataset.platform = shellParameters.get('platform');
+
 const elements = {
   today: document.querySelector('#today-count'),
   todayNote: document.querySelector('#today-note'),

@@ -23,6 +23,18 @@ All activity data stays on your device. PromptTrail has no account, external ser
 - Node.js 22.5 or later
 - Claude Code with hook support
 
+## Desktop builds
+
+The release workflow creates these desktop packages:
+
+- An AppImage for general Linux distributions.
+- A `.deb` package for Ubuntu and Debian-based distributions.
+- A `.dmg` package for Intel and Apple silicon Macs.
+
+The desktop application installs its Claude Code hooks on the first launch. It uses the same local database as the command-line dashboard.
+
+The current macOS packages do not have an Apple signature. macOS displays a security warning until a release uses signing and notarization.
+
 ## Install from this repository
 
 1. Clone this repository.
@@ -133,6 +145,24 @@ Run the JavaScript syntax checks.
 
 ```bash
 npm run check
+```
+
+Start the Electron application.
+
+```bash
+npm run desktop
+```
+
+Build the Linux packages.
+
+```bash
+npm run build:linux
+```
+
+Build the macOS package on a Mac.
+
+```bash
+npm run build:mac
 ```
 
 Use a temporary database during development.
