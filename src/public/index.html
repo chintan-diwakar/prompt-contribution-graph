@@ -3,87 +3,114 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
-    <meta name="theme-color" content="#101210">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#f6f1e8">
     <title>PromptTrail</title>
     <link rel="stylesheet" href="/style.css">
   </head>
   <body>
-    <div class="ambient ambient-one"></div>
-    <div class="ambient ambient-two"></div>
-    <main class="shell">
-      <header class="topbar">
-        <a class="brand" href="/" aria-label="PromptTrail home">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 32 32" role="img">
-              <path d="M6 23.5c4.8 0 4.7-15 9.6-15s3.9 15 10.4 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="6" cy="23.5" r="2.2" fill="currentColor"/>
-              <circle cx="26" cy="23.5" r="2.2" fill="currentColor"/>
-            </svg>
-          </span>
-          <span>PromptTrail</span>
-        </a>
-        <div class="local-badge"><span></span> Local only</div>
-      </header>
+    <main class="app-frame">
+      <section id="activity-view" class="screen activity-view" aria-labelledby="page-title">
+        <header class="activity-header">
+          <div class="title-lockup">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 36 36">
+                <path class="trail-path" d="M6 26c5 0 5-16 11-16s4 16 13 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+                <circle cx="6" cy="26" r="2.5" fill="currentColor"/>
+                <circle cx="17" cy="10" r="2.5" fill="currentColor"/>
+                <circle cx="30" cy="26" r="2.5" fill="currentColor"/>
+              </svg>
+            </span>
+            <div>
+              <h1 id="page-title">Prompt Activity</h1>
+              <p>Tracking your daily prompting habit.</p>
+            </div>
+          </div>
+          <a class="history-link" href="#history">
+            History
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6"></path></svg>
+          </a>
+        </header>
 
-      <section class="hero" aria-labelledby="page-title">
-        <div>
-          <p class="eyebrow">YOUR CLAUDE CODE ACTIVITY</p>
-          <h1 id="page-title">Build momentum,<br><em>one prompt at a time.</em></h1>
-        </div>
-        <p class="hero-copy">A private record of the questions, ideas, and instructions that moved your work forward.</p>
+        <section class="stats" aria-label="Prompt statistics">
+          <article class="stat-card stat-primary">
+            <span class="stat-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"></path></svg>
+            </span>
+            <div class="stat-copy">
+              <p>Prompts today</p>
+              <strong id="today-count">—</strong>
+              <span id="today-note">Loading activity</span>
+            </div>
+            <span class="sunburst" aria-hidden="true"></span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M13.5 3.5c.6 3.6-2.8 4.8-3.8 7.4-.8 2.1.3 4.2 2.3 4.8-1.2-2.3.4-3.8 1.6-5.1 2.1 1.5 3.4 3.4 3.4 5.6a5 5 0 0 1-10 0c0-4.6 4-7.1 6.5-12.7Z"></path></svg>
+            </span>
+            <div class="stat-copy">
+              <p>Current streak</p>
+              <strong><span id="current-streak">—</span><small> days</small></strong>
+              <span>Keep it going</span>
+            </div>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M8 4h8v4a4 4 0 0 1-8 0V4ZM9 20h6M12 12v8M8 6H4v2a4 4 0 0 0 4 4M16 6h4v2a4 4 0 0 1-4 4"></path></svg>
+            </span>
+            <div class="stat-copy">
+              <p>Longest streak</p>
+              <strong><span id="longest-streak">—</span><small> days</small></strong>
+              <span>Personal best</span>
+            </div>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Zm7 12 .7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7L19 15Z"></path></svg>
+            </span>
+            <div class="stat-copy">
+              <p>All-time prompts</p>
+              <strong id="total-count">—</strong>
+              <span>Across all time</span>
+            </div>
+          </article>
+        </section>
+
+        <section class="trail-card" aria-labelledby="activity-title">
+          <div class="trail-heading">
+            <div class="trail-title">
+              <span class="grid-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <div>
+                <h2 id="activity-title">Prompt Trail</h2>
+                <p>Your contribution trail over the last 12 months.</p>
+              </div>
+            </div>
+            <div class="legend" aria-label="Contribution intensity legend">
+              <span>Less activity</span><i class="level-0"></i><i class="level-1"></i><i class="level-2"></i><i class="level-3"></i><i class="level-4"></i><span>More activity</span>
+            </div>
+          </div>
+          <div class="chart-scroll">
+            <div id="month-labels" class="month-labels" aria-hidden="true"></div>
+            <div class="chart-layout">
+              <div class="day-labels" aria-hidden="true"><span>Mon</span><span>Wed</span><span>Fri</span></div>
+              <div id="heatmap" class="heatmap" role="img" aria-label="Daily prompt contribution chart"></div>
+            </div>
+          </div>
+        </section>
       </section>
 
-      <section class="stats" aria-label="Prompt statistics">
-        <article class="stat-card stat-primary">
-          <p>Prompts today</p>
-          <strong id="today-count">—</strong>
-          <span id="today-note">Loading activity</span>
-        </article>
-        <article class="stat-card">
-          <p>Current streak</p>
-          <strong><span id="current-streak">—</span><small> days</small></strong>
-          <span>Keep the trail warm</span>
-        </article>
-        <article class="stat-card">
-          <p>Longest streak</p>
-          <strong><span id="longest-streak">—</span><small> days</small></strong>
-          <span>Your personal best</span>
-        </article>
-        <article class="stat-card">
-          <p>All-time prompts</p>
-          <strong id="total-count">—</strong>
-          <span>Stored on this device</span>
-        </article>
-      </section>
-
-      <section class="panel contribution-panel" aria-labelledby="activity-title">
-        <div class="panel-heading">
+      <section id="history-view" class="screen history-view" aria-labelledby="history-title" hidden>
+        <header class="history-header">
+          <a class="back-link" href="#activity">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m13 4-6 6 6 6"></path></svg>
+            Back
+          </a>
           <div>
-            <p class="eyebrow">THE LAST YEAR</p>
-            <h2 id="activity-title">Contribution trail</h2>
-          </div>
-          <div class="legend" aria-label="Contribution intensity legend">
-            <span>Less</span><i class="level-0"></i><i class="level-1"></i><i class="level-2"></i><i class="level-3"></i><i class="level-4"></i><span>More</span>
-          </div>
-        </div>
-        <div class="chart-scroll">
-          <div id="month-labels" class="month-labels" aria-hidden="true"></div>
-          <div class="chart-layout">
-            <div class="day-labels" aria-hidden="true"><span>Mon</span><span>Wed</span><span>Fri</span></div>
-            <div id="heatmap" class="heatmap" role="img" aria-label="Daily prompt contribution chart"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel history-panel" aria-labelledby="history-title">
-        <div class="panel-heading history-heading">
-          <div>
-            <p class="eyebrow">THE ARCHIVE</p>
-            <h2 id="history-title">Prompt history</h2>
+            <h1 id="history-title">Prompt History</h1>
+            <p>Your prompts, Claude responses, and tool activity.</p>
           </div>
           <p id="result-count" class="result-count"></p>
-        </div>
+        </header>
 
         <form id="filters" class="filters" role="search">
           <label class="search-box">
@@ -97,17 +124,11 @@
           </label>
         </form>
 
-        <div id="prompt-list" class="prompt-list" aria-live="polite">
-          <div class="loading-row">Loading your prompt trail…</div>
-        </div>
+        <div id="prompt-list" class="prompt-list" aria-live="polite"></div>
         <button id="load-more" class="load-more" type="button" hidden>Load more prompts</button>
       </section>
-
-      <footer>
-        <span>PromptTrail</span>
-        <p>Your prompts stay on this device. No account. No telemetry.</p>
-      </footer>
     </main>
+
     <template id="prompt-template">
       <article class="prompt-card">
         <div class="prompt-meta">

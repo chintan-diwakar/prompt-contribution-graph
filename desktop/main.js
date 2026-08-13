@@ -57,13 +57,13 @@ function createApplicationMenu() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 900,
-    minWidth: 390,
-    minHeight: 620,
+    width: 1180,
+    height: 760,
+    minWidth: 720,
+    minHeight: 560,
     show: false,
     title: 'PromptTrail',
-    backgroundColor: process.platform === 'darwin' ? '#00000000' : '#050812',
+    backgroundColor: process.platform === 'darwin' ? '#00000000' : '#f0ebe2',
     transparent: process.platform === 'darwin',
     vibrancy: process.platform === 'darwin' ? 'under-window' : undefined,
     visualEffectState: process.platform === 'darwin' ? 'active' : undefined,

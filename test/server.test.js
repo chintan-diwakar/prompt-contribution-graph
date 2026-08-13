@@ -19,7 +19,11 @@ test('serves the dashboard API and deletes a prompt', async (t) => {
 
   const page = await fetch(url);
   assert.equal(page.status, 200);
-  assert.match(await page.text(), /PromptTrail/);
+  const markup = await page.text();
+  assert.match(markup, /Prompt Activity/);
+  assert.match(markup, /id="history-view"[^>]*hidden/);
+  assert.match(markup, /href="#history"/);
+  assert.match(markup, /href="#activity"/);
 
   const history = await fetch(`${url}/api/prompts?q=dashboard`).then((response) => response.json());
   assert.equal(history.total, 1);
