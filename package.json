@@ -25,8 +25,8 @@
     "start": "node --no-warnings ./src/cli.js start",
     "desktop": "electron .",
     "desktop:pack": "electron-builder --dir",
-    "build:linux": "electron-builder --linux AppImage deb",
-    "build:mac": "electron-builder --mac dmg",
+    "build:linux": "electron-builder --linux AppImage deb --publish never",
+    "build:mac": "electron-builder --mac dmg --publish never",
     "test": "node --no-warnings --test",
     "check": "node --check ./src/cli.js && node --check ./src/server.js && node --check ./src/public/app.js && node --check ./desktop/main.js"
   },
