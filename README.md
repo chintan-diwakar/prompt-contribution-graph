@@ -1,3 +1,5 @@
+
+
 <div align="center">
   <img src="build/icon.svg" width="128" alt="Prompt Contribution Graph logo">
   <h1>Prompt Contribution Graph</h1>
@@ -56,7 +58,7 @@ The **Share** button captures the activity screen. The screenshot does not conta
 
 On macOS, Prompt Contribution Graph opens the system share menu. Select X, Messages, AirDrop, Mail, or another available service.
 
-On Linux and Windows, Prompt Contribution Graph copies the screenshot and opens an X post window. Paste the screenshot into the post.
+On Linux, Prompt Contribution Graph copies the screenshot and opens an X post window. Paste the screenshot into the post.
 
 Prompt Contribution Graph also saves each screenshot in the `Prompt Contribution Graph` folder in your Pictures directory.
 
