@@ -8,3 +8,5 @@ out/
 *.sqlite-shm
 *.sqlite-wal
 .prompttrail-data/
+src-tauri/target/
+src-tauri/gen/schemas/

@@ -1,0 +1,29 @@
+[package]
+name = "prompt-contribution-graph"
+version = "0.2.0"
+description = "Track daily prompt contributions across CLI coding agents"
+authors = ["Chintan Diwakar"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "prompt_contribution_graph_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+base64 = "0.22"
+chrono = { version = "0.4", features = ["clock"] }
+dirs = "6"
+rusqlite = { version = "0.37", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+url = "2"
+uuid = { version = "1", features = ["v4"] }
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-single-instance = "2"

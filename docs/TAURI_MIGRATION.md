@@ -1,12 +1,26 @@
-# Future Desktop Migration: Electron to Tauri
+# Desktop Migration: Electron to Tauri
 
-Status: Proposed
+Status: Migration implementation complete; v0.2.0 release pending
 
-Target release: Not scheduled
+Completed: August 21, 2026
 
-This document defines a future migration from Electron to Tauri 2. The migration is not part of the current release.
+This document records the Electron-to-Tauri 2 migration and its compatibility requirements. The implementation also includes an iOS target.
 
 The public project name changed from PromptTrail to Prompt Contribution Graph. Legacy identifiers will remain during this migration to preserve existing installations.
+
+## Scope completion
+
+The Electron-to-Tauri migration and iOS build scope is complete:
+
+- [x] Replace the Electron desktop process and preload bridge with Tauri 2.
+- [x] Preserve the existing SQLite database, legacy paths, and rollback compatibility.
+- [x] Move hook capture, hook installation, queries, and desktop integrations into Rust.
+- [x] Keep one frontend for the browser dashboard, Tauri desktop app, and iOS app.
+- [x] Preserve private aggregate-image sharing without screen-capture permission.
+- [x] Add macOS and Linux packaging plus an unsigned iOS IPA build to CI.
+- [x] Generate and validate native macOS and iOS artifacts locally.
+
+Apple distribution credentials, macOS notarization, and App Store/TestFlight publication are release operations rather than migration implementation. They remain pending for v0.2.0.
 
 ## Why migrate
 
@@ -50,7 +64,7 @@ Tauri uses the native webview of each operating system. It does not package a br
 
 The provider interface will support Claude Code and future providers. Provider work can proceed in a separate release.
 
-## Current architecture
+## Previous Electron architecture
 
 The current application uses these components:
 
@@ -63,16 +77,20 @@ The current application uses these components:
 
 The packaged Electron executable also handles `--capture-hook`. This mode writes one event and exits without opening a window.
 
-## Target architecture
+## Implemented architecture
 
-The target repository will use a Rust workspace with three clear boundaries.
+The repository uses a Tauri Rust crate with clear module boundaries while retaining the Node CLI during the transition.
 
 ```text
-crates/prompttrail-core/   Event models, SQLite, paths, and queries
-crates/prompttrail-cli/    Hook capture, hook installation, status, and browser server
-src-tauri/                 Tauri commands, windows, menus, and sharing
+src-tauri/src/database.rs  SQLite, paths, migrations, and queries
+src-tauri/src/capture.rs   Native hook event capture
+src-tauri/src/hooks.rs     Desktop hook status and installation
+src-tauri/src/lib.rs       Tauri commands, window lifecycle, and sharing
+src/                       Transitional Node CLI and browser server
 src/public/                Shared HTML, CSS, and JavaScript interface
 ```
+
+The iOS build uses the same Rust queries and frontend. It stores data in the application sandbox and does not expose desktop hook installation, because iOS cannot execute host-machine Claude Code hooks.
 
 ### Rust core
 
@@ -160,7 +178,7 @@ Database tests will use copies of v0.1 and v0.2 database fixtures. Each test wil
 
 ## Migration phases
 
-### Phase 0: Reduce Electron packages
+### Phase 0: Reduce Electron packages — superseded
 
 1. Keep only the `en-US` Electron language pack.
 2. Use maximum package compression.
@@ -168,7 +186,7 @@ Database tests will use copies of v0.1 and v0.2 database fixtures. Each test wil
 
 This phase is independent from the Tauri migration.
 
-### Phase 1: Add a frontend data boundary
+### Phase 1: Add a frontend data boundary — complete
 
 1. Move all current `fetch()` calls behind `dataClient`.
 2. Keep the HTTP implementation as the default.
@@ -176,28 +194,28 @@ This phase is independent from the Tauri migration.
 
 The application behavior must remain unchanged in this phase.
 
-### Phase 2: Build the Rust core
+### Phase 2: Build the Rust core — complete
 
 1. Implement the existing SQLite schema and queries in Rust.
 2. Implement the current safe tool-target rules.
 3. Add fixture tests for every supported hook event.
 4. Compare Rust results with the current Node.js results.
 
-### Phase 3: Build the capture and hook path
+### Phase 3: Build the capture and hook path — complete
 
 1. Add `--capture-hook` before Tauri initialization.
 2. Preserve atomic settings updates and backups.
 3. Measure capture latency on Linux and macOS.
 4. Run repeated hook tests with concurrent SQLite writes.
 
-### Phase 4: Add the Tauri shell
+### Phase 4: Add the Tauri shell — complete
 
 1. Package the existing interface with Tauri 2.
 2. Add the typed command allowlist.
 3. Match the current window size, materials, menus, and navigation.
 4. Add the browser and Tauri `dataClient` implementations.
 
-### Phase 5: Restore desktop integrations
+### Phase 5: Restore desktop integrations — complete
 
 1. Add the dedicated share-image renderer.
 2. Add the macOS share service.
@@ -205,7 +223,7 @@ The application behavior must remain unchanged in this phase.
 4. Install hooks after the first packaged launch.
 5. Preserve single-instance behavior.
 
-### Phase 6: Build and release
+### Phase 6: Build and release — packaging complete, publication pending
 
 1. Add Rust formatting, lint, and test jobs to CI.
 2. Build Linux packages on Ubuntu.
@@ -271,9 +289,11 @@ No stable Tauri release will delete an old column or table during the rollback w
 
 ## Release decision
 
-The migration can enter a stable release only after all five acceptance gates pass on protected CI.
+The migration implementation is complete. It can enter a stable release after all five acceptance gates pass on protected CI and the macOS artifacts are signed and notarized.
 
 The maintainer will publish measured artifact sizes and known limitations with the preview release.
+
+See [the v0.2.0 release plan](RELEASE_V0.2.0.md) for the remaining publication steps.
 
 ## Official references
 
