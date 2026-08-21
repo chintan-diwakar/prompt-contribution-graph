@@ -2,8 +2,9 @@ Prompt Contribution Graph v0.2.0 replaces Electron with Tauri 2, substantially r
 
 ## Highlights
 
-- Native Tauri desktop build for macOS.
+- Native Tauri desktop builds for macOS and Linux.
 - One universal macOS DMG for Apple silicon and Intel.
+- Ubuntu/Debian x86-64 package and a portable x86-64 AppImage.
 - Rust-based SQLite access and low-overhead Claude Code hook capture.
 - Automatic compatibility with existing PromptTrail databases and hook settings.
 - Private activity sharing based only on aggregate statistics.
@@ -12,7 +13,7 @@ Prompt Contribution Graph v0.2.0 replaces Electron with Tauri 2, substantially r
 ## Known limitations
 
 - This release is ad-hoc signed and not notarized. macOS will display a Gatekeeper warning.
-- The release is macOS-only and does not include iPhone, iPad, or Linux installers.
+- Windows, iPhone, and iPad builds are not included.
 
 ## Upgrade note
 

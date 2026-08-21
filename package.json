@@ -25,6 +25,7 @@
     "tauri": "tauri",
     "desktop": "tauri dev",
     "desktop:pack": "tauri build --no-bundle",
+    "build:linux": "CI=true tauri build --bundles deb,appimage",
     "build:mac": "CI=true tauri build --bundles dmg",
     "test": "node --no-warnings --test",
     "check:js": "node --check ./src/cli.js && node --check ./src/server.js && node --check ./src/public/app.js && node --check ./src/public/data-client.js && node --check ./src/public/insights.js && node --check ./src/public/share-image.js",

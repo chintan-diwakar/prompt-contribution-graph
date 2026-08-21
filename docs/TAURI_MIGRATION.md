@@ -4,13 +4,13 @@ Status: Migration complete; v0.2.0 stable GitHub release published
 
 Completed: August 21, 2026
 
-This document records the Electron-to-Tauri 2 migration and its compatibility requirements. Distribution is scoped to macOS.
+This document records the Electron-to-Tauri 2 migration and its compatibility requirements. Distribution covers macOS and x86-64 Linux.
 
 The public project name changed from PromptTrail to Prompt Contribution Graph. Legacy identifiers will remain during this migration to preserve existing installations.
 
 ## Scope completion
 
-The Electron-to-Tauri macOS migration scope is complete:
+The Electron-to-Tauri desktop migration scope is complete:
 
 - [x] Replace the Electron desktop process and preload bridge with Tauri 2.
 - [x] Preserve the existing SQLite database, legacy paths, and rollback compatibility.
@@ -19,8 +19,9 @@ The Electron-to-Tauri macOS migration scope is complete:
 - [x] Preserve private aggregate-image sharing without screen-capture permission.
 - [x] Add universal Intel and Apple silicon macOS packaging to CI.
 - [x] Generate and validate the universal macOS artifact locally and in CI.
+- [x] Add and validate Ubuntu/Debian and AppImage packaging on x86-64 Linux.
 
-Developer ID credentials and macOS notarization remain pending for a stable Apple distribution. IPA and Linux installers are outside the release scope.
+Developer ID credentials and macOS notarization remain pending for a trusted Apple distribution. Windows, iPhone, and iPad installers are outside the release scope.
 
 ## Why migrate
 
@@ -224,9 +225,10 @@ The application behavior must remain unchanged in this phase.
 
 1. Add Rust formatting, lint, and test jobs to CI.
 2. Build one universal Intel and Apple silicon DMG on macOS.
-3. Record the artifact size for every build.
-4. Sign and notarize the macOS release.
-5. Publish a preview release before the stable release.
+3. Build an x86-64 Ubuntu/Debian package and AppImage on Ubuntu 22.04.
+4. Record the artifact size for every build.
+5. Sign and notarize the macOS release.
+6. Publish a preview release before the stable release.
 
 ## Acceptance gates
 
@@ -284,7 +286,7 @@ No stable Tauri release will delete an old column or table during the rollback w
 
 ## Release decision
 
-The migration implementation is complete and the stable v0.2.0 GitHub release passed protected CI. Apple-trusted distribution still requires signing and notarization.
+The migration implementation is complete, and the stable v0.2.0 GitHub release includes macOS and x86-64 Linux packages built by protected CI. Apple-trusted distribution still requires signing and notarization.
 
 The maintainer will publish measured artifact sizes and known limitations with the preview release.
 
