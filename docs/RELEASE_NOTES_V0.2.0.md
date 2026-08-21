@@ -11,7 +11,7 @@ Prompt Contribution Graph v0.2.0 replaces Electron with Tauri 2, substantially r
 
 ## Known limitations
 
-- This prerelease is ad-hoc signed and not notarized. macOS will display a Gatekeeper warning.
+- This release is ad-hoc signed and not notarized. macOS will display a Gatekeeper warning.
 - The release is macOS-only and does not include iPhone, iPad, or Linux installers.
 
 ## Upgrade note

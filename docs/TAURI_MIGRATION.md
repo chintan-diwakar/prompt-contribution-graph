@@ -1,6 +1,6 @@
 # Desktop Migration: Electron to Tauri
 
-Status: Migration complete; v0.2.0 prerelease published
+Status: Migration complete; v0.2.0 stable GitHub release published
 
 Completed: August 21, 2026
 
@@ -220,7 +220,7 @@ The application behavior must remain unchanged in this phase.
 4. Install hooks after the first packaged launch.
 5. Preserve single-instance behavior.
 
-### Phase 6: Build and release — prerelease complete, notarized distribution pending
+### Phase 6: Build and release — GitHub release complete, notarization pending
 
 1. Add Rust formatting, lint, and test jobs to CI.
 2. Build one universal Intel and Apple silicon DMG on macOS.
@@ -284,7 +284,7 @@ No stable Tauri release will delete an old column or table during the rollback w
 
 ## Release decision
 
-The migration implementation is complete and the v0.2.0 prerelease passed protected CI. It can be promoted to a stable Apple distribution after the macOS artifacts are signed and notarized.
+The migration implementation is complete and the stable v0.2.0 GitHub release passed protected CI. Apple-trusted distribution still requires signing and notarization.
 
 The maintainer will publish measured artifact sizes and known limitations with the preview release.
 

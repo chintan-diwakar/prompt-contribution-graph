@@ -1,6 +1,6 @@
 # v0.2.0 Release Plan
 
-Status: [Prerelease published](https://github.com/chintan-diwakar/prompt-contribution-graph/releases/tag/v0.2.0) on August 21, 2026
+Status: [Stable GitHub release published](https://github.com/chintan-diwakar/prompt-contribution-graph/releases/tag/v0.2.0) on August 21, 2026
 
 Target: `v0.2.0`
 
