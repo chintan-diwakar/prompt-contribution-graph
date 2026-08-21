@@ -1,6 +1,6 @@
 # v0.2.0 Release Plan
 
-Status: Prerelease automation prepared
+Status: [Prerelease published](https://github.com/chintan-diwakar/prompt-contribution-graph/releases/tag/v0.2.0) on August 21, 2026
 
 Target: `v0.2.0`
 
@@ -26,7 +26,7 @@ This release completes the Electron-to-Tauri 2 migration and introduces the iOS 
 - [x] The macOS bundle passes local code-signature verification.
 - [x] The unsigned iOS IPA builds locally.
 - [x] Update the tag workflow to build one universal macOS DMG and publish verified release assets.
-- [ ] Protected GitHub Actions checks pass for the release commit.
+- [x] Protected GitHub Actions checks pass for the release commit.
 - [ ] Smoke-test database migration using a copy of an existing Electron database.
 - [ ] Smoke-test hook capture and uninstall/reinstall from the packaged app.
 - [ ] Smoke-test Linux AppImage and Debian packages produced by CI.

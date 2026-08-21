@@ -1,6 +1,6 @@
 # Desktop Migration: Electron to Tauri
 
-Status: Migration implementation complete; v0.2.0 release pending
+Status: Migration complete; v0.2.0 prerelease published
 
 Completed: August 21, 2026
 
@@ -20,7 +20,7 @@ The Electron-to-Tauri migration and iOS build scope is complete:
 - [x] Add macOS and Linux packaging plus an unsigned iOS IPA build to CI.
 - [x] Generate and validate native macOS and iOS artifacts locally.
 
-Apple distribution credentials, macOS notarization, and App Store/TestFlight publication are release operations rather than migration implementation. They remain pending for v0.2.0.
+Apple distribution credentials, macOS notarization, and App Store/TestFlight publication are release operations rather than migration implementation. They remain pending for a stable Apple distribution.
 
 ## Why migrate
 
@@ -223,7 +223,7 @@ The application behavior must remain unchanged in this phase.
 4. Install hooks after the first packaged launch.
 5. Preserve single-instance behavior.
 
-### Phase 6: Build and release — packaging complete, publication pending
+### Phase 6: Build and release — prerelease complete, notarized distribution pending
 
 1. Add Rust formatting, lint, and test jobs to CI.
 2. Build Linux packages on Ubuntu.
@@ -289,7 +289,7 @@ No stable Tauri release will delete an old column or table during the rollback w
 
 ## Release decision
 
-The migration implementation is complete. It can enter a stable release after all five acceptance gates pass on protected CI and the macOS artifacts are signed and notarized.
+The migration implementation is complete and the v0.2.0 prerelease passed protected CI. It can be promoted to a stable Apple distribution after the macOS artifacts are signed and notarized.
 
 The maintainer will publish measured artifact sizes and known limitations with the preview release.
 
