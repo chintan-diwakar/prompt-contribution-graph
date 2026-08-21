@@ -133,7 +133,7 @@ jobs:
       - name: Generate checksums
         shell: bash
         run: |
-          find release-artifacts -type f -print0 | sort -z | xargs -0 sha256sum > release-artifacts/SHA256SUMS
+          find release-artifacts -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > release-artifacts/SHA256SUMS
       - name: Publish prerelease
         shell: bash
         env:
