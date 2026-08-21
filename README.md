@@ -7,7 +7,7 @@
     <a href="https://github.com/chintan-diwakar/prompt-contribution-graph/actions/workflows/desktop-builds.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/chintan-diwakar/prompt-contribution-graph/desktop-builds.yml?branch=main&amp;style=flat-square&amp;label=build"></a>
     <a href="https://github.com/chintan-diwakar/prompt-contribution-graph/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/chintan-diwakar/prompt-contribution-graph?style=flat-square"></a>
     <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-24292f?style=flat-square"></a>
-    <img alt="macOS" src="https://img.shields.io/badge/platform-macOS-24292f?style=flat-square">
+    <img alt="macOS and Ubuntu" src="https://img.shields.io/badge/platform-macOS%20%7C%20Ubuntu-24292f?style=flat-square">
     <img alt="Local first" src="https://img.shields.io/badge/data-local--first-d95725?style=flat-square">
   </p>
 
@@ -39,9 +39,13 @@
 - Rust 1.77.2 or later for native builds
 - Claude Code with hook support
 
-## macOS build
+## Desktop builds
 
-The release workflow creates one universal `.dmg` for Intel and Apple silicon Macs. iPhone and iPad IPA files are not part of the product or release.
+The release workflow creates these desktop packages:
+
+- An x86-64 `.deb` package for Ubuntu and Debian-based distributions.
+- An x86-64 AppImage for other Linux distributions.
+- One universal `.dmg` for Intel and Apple silicon Macs.
 
 The Tauri desktop application installs its Claude Code hooks on the first packaged launch. It uses the same local database as the command-line dashboard and existing Electron releases.
 
@@ -163,6 +167,12 @@ Start the Tauri application.
 npm run desktop
 ```
 
+Build the Ubuntu `.deb` and Linux AppImage on an x86-64 Linux system.
+
+```bash
+npm run build:linux
+```
+
 Build the macOS package on a Mac.
 
 ```bash
@@ -177,7 +187,7 @@ PROMPTTRAIL_HOME="$PWD/.prompttrail-data" npm start -- --no-open
 
 ## Planned work
 
-- The Electron-to-Tauri macOS migration is complete for v0.2.0. See the [migration record](docs/TAURI_MIGRATION.md) and [release plan](docs/RELEASE_V0.2.0.md).
+- The Electron-to-Tauri desktop migration is complete for v0.2.0. See the [migration record](docs/TAURI_MIGRATION.md) and [release plan](docs/RELEASE_V0.2.0.md).
 - Add a Codex hook adapter and installer.
 - Add optional prompt redaction rules.
 - Add JSON and CSV export.
