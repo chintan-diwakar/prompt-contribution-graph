@@ -7,7 +7,7 @@
     <a href="https://github.com/chintan-diwakar/prompt-contribution-graph/actions/workflows/desktop-builds.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/chintan-diwakar/prompt-contribution-graph/desktop-builds.yml?branch=main&amp;style=flat-square&amp;label=build"></a>
     <a href="https://github.com/chintan-diwakar/prompt-contribution-graph/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/chintan-diwakar/prompt-contribution-graph?style=flat-square"></a>
     <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-24292f?style=flat-square"></a>
-    <img alt="macOS, Linux, and iOS" src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20iOS-24292f?style=flat-square">
+    <img alt="macOS" src="https://img.shields.io/badge/platform-macOS-24292f?style=flat-square">
     <img alt="Local first" src="https://img.shields.io/badge/data-local--first-d95725?style=flat-square">
   </p>
 
@@ -39,13 +39,9 @@
 - Rust 1.77.2 or later for native builds
 - Claude Code with hook support
 
-## Desktop builds
+## macOS build
 
-The release workflow creates these desktop packages:
-
-- An AppImage for general Linux distributions.
-- A `.deb` package for Ubuntu and Debian-based distributions.
-- A `.dmg` package for Intel and Apple silicon Macs.
+The release workflow creates one universal `.dmg` for Intel and Apple silicon Macs. iPhone and iPad IPA files are not part of the product or release.
 
 The Tauri desktop application installs its Claude Code hooks on the first packaged launch. It uses the same local database as the command-line dashboard and existing Electron releases.
 
@@ -54,20 +50,6 @@ The current macOS packages do not have an Apple signature. macOS displays a secu
 ### Share activity
 
 The **Share** button renders a dedicated image containing only counts, streaks, the daily insight, and the contribution graph. It sends that PNG to the native share sheet when file sharing is available. The desktop fallback saves the PNG in the `Prompt Contribution Graph` folder in Pictures and opens an X post window. Prompt text, responses, project names, and tool details are not included.
-
-### iOS build
-
-The iOS target uses the same Tauri/Rust data commands and responsive interface. Its SQLite database lives in the iOS application sandbox. iOS cannot install or execute Claude Code hooks on a Mac, so the mobile database is separate unless an import or sync feature is added later.
-
-Generate and build the Xcode project on a Mac:
-
-```bash
-rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
-npm run ios:init -- --ci
-npm run ios:build -- --target aarch64-sim --debug --no-sign --ci
-```
-
-Use `npm run ios:dev` to select a simulator or connected device interactively. `npm run ios:build -- --target aarch64 --no-sign --ci` also produces an unsigned release IPA. Installing it on a device or distributing it still requires an Apple Developer signing identity and provisioning profile.
 
 ## Install from this repository
 
@@ -181,23 +163,10 @@ Start the Tauri application.
 npm run desktop
 ```
 
-Build the Linux packages.
-
-```bash
-npm run build:linux
-```
-
 Build the macOS package on a Mac.
 
 ```bash
 npm run build:mac
-```
-
-Build the unsigned iOS simulator application on a Mac.
-
-```bash
-npm run ios:init -- --ci
-npm run ios:build -- --target aarch64-sim --debug --no-sign --ci
 ```
 
 Use a temporary database during development.
@@ -208,9 +177,8 @@ PROMPTTRAIL_HOME="$PWD/.prompttrail-data" npm start -- --no-open
 
 ## Planned work
 
-- The Electron-to-Tauri desktop migration and iOS build target are complete for v0.2.0. See the [migration record](docs/TAURI_MIGRATION.md) and [release plan](docs/RELEASE_V0.2.0.md).
+- The Electron-to-Tauri macOS migration is complete for v0.2.0. See the [migration record](docs/TAURI_MIGRATION.md) and [release plan](docs/RELEASE_V0.2.0.md).
 - Add a Codex hook adapter and installer.
-- Add an explicit database import/sync flow for the iOS companion app.
 - Add optional prompt redaction rules.
 - Add JSON and CSV export.
 - Import existing Claude Code transcript files.
