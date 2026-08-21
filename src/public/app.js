@@ -1,4 +1,6 @@
 import { createDailyInsight, createShareText } from './insights.js';
+import { dataClient } from './data-client.js';
+import { createShareImage, fileToDataUrl } from './share-image.js';
 
 const state = {
   offset: 0,
@@ -11,7 +13,11 @@ const state = {
 };
 
 const shellParameters = new URLSearchParams(window.location.search);
-if (shellParameters.get('desktop') === '1') document.documentElement.dataset.shell = 'desktop';
+const isMobileTauri = dataClient.kind === 'tauri'
+  && (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+if (isMobileTauri) document.documentElement.dataset.shell = 'mobile';
+else if (dataClient.kind === 'tauri' || shellParameters.get('desktop') === '1') document.documentElement.dataset.shell = 'desktop';
 if (shellParameters.get('platform')) document.documentElement.dataset.platform = shellParameters.get('platform');
 
 const elements = {
@@ -34,7 +40,6 @@ const elements = {
   dailyInsight: document.querySelector('#daily-insight'),
   shareButton: document.querySelector('#share-button'),
   shareStatus: document.querySelector('#share-status'),
-  appFrame: document.querySelector('.app-frame'),
 };
 
 function localDateKey(date) {
@@ -224,8 +229,9 @@ function createPromptCard(prompt) {
   deleteButton.addEventListener('click', async () => {
     if (!window.confirm('Delete this prompt from the local database?')) return;
     deleteButton.disabled = true;
-    const response = await fetch(`/api/prompts/${encodeURIComponent(prompt.id)}`, { method: 'DELETE' });
-    if (!response.ok) {
+    try {
+      await dataClient.deletePrompt(prompt.id);
+    } catch {
       deleteButton.disabled = false;
       window.alert('Prompt Contribution Graph could not delete this prompt.');
       return;
@@ -236,9 +242,7 @@ function createPromptCard(prompt) {
 }
 
 async function loadSummary() {
-  const response = await fetch('/api/summary?days=371');
-  if (!response.ok) throw new Error('Could not load the activity summary.');
-  const summary = await response.json();
+  const summary = await dataClient.getSummary(371);
   const insight = createDailyInsight(summary);
   state.summary = summary;
   state.insight = insight;
@@ -262,10 +266,6 @@ function showShareStatus(message, isError = false) {
   shareStatusTimer = setTimeout(() => { elements.shareStatus.hidden = true; }, 5_000);
 }
 
-function waitForPaint() {
-  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-}
-
 async function shareActivity() {
   if (!state.summary || elements.shareButton.disabled) return;
   elements.shareButton.disabled = true;
@@ -273,27 +273,36 @@ async function shareActivity() {
   document.documentElement.dataset.capturing = 'true';
 
   try {
-    await waitForPaint();
-    const bounds = elements.appFrame.getBoundingClientRect();
+    const image = await createShareImage(state.summary, state.insight);
     const payload = {
-      rect: { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },
       text: createShareText(state.summary, state.insight),
+      imageDataUrl: await fileToDataUrl(image),
     };
 
-    if (window.promptTrailDesktop?.shareActivity) {
-      const result = await window.promptTrailDesktop.shareActivity(payload);
-      showShareStatus(result.mode === 'native'
-        ? 'Screenshot ready in the Mac share sheet.'
-        : 'Screenshot copied. Paste it into the X post window.');
+    if (navigator.share && navigator.canShare?.({ files: [image] })) {
+      await navigator.share({
+        title: 'Prompt Contribution Graph',
+        text: payload.text,
+        url: 'https://github.com/chintan-diwakar/prompt-contribution-graph',
+        files: [image],
+      });
+      showShareStatus('Activity shared.');
+    } else if (navigator.share) {
+      await navigator.share({
+        title: 'Prompt Contribution Graph',
+        text: payload.text,
+        url: 'https://github.com/chintan-diwakar/prompt-contribution-graph',
+      });
+      showShareStatus('Activity shared.');
     } else {
-      const url = new URL('https://x.com/intent/tweet');
-      url.searchParams.set('text', payload.text.slice(0, 240));
-      url.searchParams.set('url', 'https://github.com/chintan-diwakar/prompt-contribution-graph');
-      window.open(url, '_blank', 'noopener');
-      showShareStatus('X opened. Screenshot sharing requires the desktop app.');
+      const result = await dataClient.shareActivity(payload);
+      showShareStatus(result.filePath
+        ? `Activity image saved to ${result.filePath}.`
+        : 'Share window opened.');
     }
   } catch (error) {
-    showShareStatus(error?.message || 'Prompt Contribution Graph could not create the screenshot.', true);
+    if (error?.name === 'AbortError') showShareStatus('Share cancelled.');
+    else showShareStatus(error?.message || 'Prompt Contribution Graph could not share this activity.', true);
   } finally {
     delete document.documentElement.dataset.capturing;
     elements.shareButton.disabled = false;
@@ -302,9 +311,7 @@ async function shareActivity() {
 }
 
 async function loadProjects() {
-  const response = await fetch('/api/projects');
-  if (!response.ok) throw new Error('Could not load projects.');
-  const { items } = await response.json();
+  const items = await dataClient.listProjects();
   const selected = elements.project.value;
   elements.project.replaceChildren(new Option('All projects', ''));
   for (const item of items) {
@@ -318,15 +325,12 @@ async function loadPrompts({ reset = false } = {}) {
     state.offset = 0;
     elements.list.innerHTML = '<div class="loading-row">Loading your prompt history…</div>';
   }
-  const parameters = new URLSearchParams({
-    limit: String(state.limit),
-    offset: String(state.offset),
-    q: state.query,
+  const result = await dataClient.listPrompts({
+    limit: state.limit,
+    offset: state.offset,
+    query: state.query,
     project: state.project,
   });
-  const response = await fetch(`/api/prompts?${parameters}`);
-  if (!response.ok) throw new Error('Could not load prompt history.');
-  const result = await response.json();
   state.total = result.total;
 
   if (reset) elements.list.replaceChildren();
@@ -396,7 +400,7 @@ async function showCurrentView() {
 
 window.addEventListener('hashchange', () => showCurrentView().catch(showError));
 
-if (shellParameters.get('desktop') === '1') elements.shareButton.hidden = false;
+if (dataClient.kind === 'tauri' || shellParameters.get('desktop') === '1') elements.shareButton.hidden = false;
 
 loadSummary()
   .then(showCurrentView)

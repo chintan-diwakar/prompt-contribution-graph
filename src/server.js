@@ -10,7 +10,9 @@ const staticFiles = new Map([
   ['/', ['index.html', 'text/html; charset=utf-8']],
   ['/style.css', ['style.css', 'text/css; charset=utf-8']],
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
+  ['/data-client.js', ['data-client.js', 'text/javascript; charset=utf-8']],
   ['/insights.js', ['insights.js', 'text/javascript; charset=utf-8']],
+  ['/share-image.js', ['share-image.js', 'text/javascript; charset=utf-8']],
 ]);
 
 function sendJson(response, status, value) {

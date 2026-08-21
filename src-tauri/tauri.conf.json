@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Prompt Contribution Graph",
+  "version": "0.2.0",
+  "identifier": "dev.prompttrail.app",
+  "build": {
+    "frontendDist": "../src/public"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Prompt Contribution Graph",
+        "width": 1180,
+        "height": 760,
+        "minWidth": 720,
+        "minHeight": 560,
+        "backgroundColor": "#f0ebe2",
+        "hiddenTitle": true,
+        "titleBarStyle": "Overlay",
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; base-uri 'none'; frame-ancestors 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "DeveloperTool",
+    "shortDescription": "Daily prompt contributions for CLI coding agents",
+    "longDescription": "A local prompt, response, and tool activity dashboard for CLI coding agents.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "hardenedRuntime": true,
+      "signingIdentity": "-"
+    },
+    "iOS": {
+      "minimumSystemVersion": "15.0"
+    }
+  }
+}

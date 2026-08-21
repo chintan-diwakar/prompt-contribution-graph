@@ -28,6 +28,12 @@ test('serves the dashboard API and deletes a prompt', async (t) => {
   const insightsModule = await fetch(`${url}/insights.js`);
   assert.equal(insightsModule.status, 200);
   assert.match(await insightsModule.text(), /createDailyInsight/);
+  const dataClientModule = await fetch(`${url}/data-client.js`);
+  assert.equal(dataClientModule.status, 200);
+  assert.match(await dataClientModule.text(), /tauriInvoke/);
+  const shareImageModule = await fetch(`${url}/share-image.js`);
+  assert.equal(shareImageModule.status, 200);
+  assert.match(await shareImageModule.text(), /createShareImage/);
 
   const history = await fetch(`${url}/api/prompts?q=dashboard`).then((response) => response.json());
   assert.equal(history.total, 1);

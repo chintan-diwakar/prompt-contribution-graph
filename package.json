@@ -11,7 +11,6 @@
     "url": "https://github.com/chintan-diwakar/prompt-contribution-graph/issues"
   },
   "type": "module",
-  "main": "desktop/main.js",
   "desktopName": "Prompt Contribution Graph",
   "author": {
     "name": "Chintan Diwakar",
@@ -23,12 +22,18 @@
   },
   "scripts": {
     "start": "node --no-warnings ./src/cli.js start",
-    "desktop": "electron .",
-    "desktop:pack": "electron-builder --dir",
-    "build:linux": "electron-builder --linux AppImage deb --publish never",
-    "build:mac": "electron-builder --mac dmg --publish never",
+    "tauri": "tauri",
+    "desktop": "tauri dev",
+    "desktop:pack": "tauri build --no-bundle",
+    "build:linux": "tauri build --bundles appimage,deb",
+    "build:mac": "CI=true tauri build --bundles dmg",
+    "ios:init": "tauri ios init",
+    "ios:dev": "tauri ios dev",
+    "ios:build": "tauri ios build",
     "test": "node --no-warnings --test",
-    "check": "node --check ./src/cli.js && node --check ./src/server.js && node --check ./src/public/app.js && node --check ./src/public/insights.js && node --check ./desktop/main.js && node --check ./desktop/preload.cjs && node --check ./desktop/share-utils.js"
+    "check:js": "node --check ./src/cli.js && node --check ./src/server.js && node --check ./src/public/app.js && node --check ./src/public/data-client.js && node --check ./src/public/insights.js && node --check ./src/public/share-image.js",
+    "check:rust": "cargo check --manifest-path ./src-tauri/Cargo.toml",
+    "check": "npm run check:js && npm run check:rust"
   },
   "engines": {
     "node": ">=22.5.0"
@@ -42,78 +47,11 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "electron": "43.4.0",
-    "electron-builder": "26.15.3"
+    "@tauri-apps/cli": "2.11.4"
   },
   "files": [
     "src",
-    "desktop",
-    "build",
     "README.md",
     "LICENSE"
-  ],
-  "build": {
-    "appId": "dev.prompttrail.app",
-    "productName": "Prompt Contribution Graph",
-    "asar": true,
-    "npmRebuild": false,
-    "directories": {
-      "output": "release",
-      "buildResources": "build"
-    },
-    "files": [
-      "src/**/*",
-      "desktop/**/*",
-      "package.json"
-    ],
-    "artifactName": "prompt-contribution-graph-${version}-${os}-${arch}.${ext}",
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ],
-      "category": "Utility",
-      "synopsis": "Daily prompt contributions for CLI coding agents",
-      "description": "A local prompt, response, and tool activity dashboard for CLI coding agents.",
-      "maintainer": "Chintan Diwakar",
-      "executableName": "prompttrail",
-      "syncDesktopName": true,
-      "desktop": {
-        "entry": {
-          "Name": "Prompt Contribution Graph",
-          "Comment": "Daily prompt contributions for CLI coding agents",
-          "Categories": "Utility;Development;",
-          "Keywords": "Claude;coding agents;prompts;contributions;productivity;local;",
-          "StartupWMClass": "Prompt Contribution Graph"
-        }
-      }
-    },
-    "mac": {
-      "target": "dmg",
-      "category": "public.app-category.developer-tools",
-      "identity": null,
-      "hardenedRuntime": false
-    },
-    "dmg": {
-      "title": "Prompt Contribution Graph ${version}",
-      "backgroundColor": "#101210",
-      "window": {
-        "width": 540,
-        "height": 380
-      },
-      "contents": [
-        {
-          "x": 140,
-          "y": 190,
-          "type": "file"
-        },
-        {
-          "x": 400,
-          "y": 190,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    }
-  }
+  ]
 }
