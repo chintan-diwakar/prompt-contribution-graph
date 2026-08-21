@@ -43,9 +43,6 @@
       "minimumSystemVersion": "11.0",
       "hardenedRuntime": true,
       "signingIdentity": "-"
-    },
-    "iOS": {
-      "minimumSystemVersion": "15.0"
     }
   }
 }

@@ -39,34 +39,6 @@ jobs:
       - run: cargo test --manifest-path src-tauri/Cargo.toml
       - run: npm test
 
-  linux:
-    name: Linux AppImage and Ubuntu deb
-    needs: test
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: swatinem/rust-cache@v2
-        with:
-          workspaces: "./src-tauri -> target"
-      - name: Install Tauri system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf libfuse2 file
-      - run: npm ci
-      - run: npm run build:linux
-      - uses: actions/upload-artifact@v7
-        with:
-          name: prompt-contribution-graph-linux-x64
-          path: |
-            src-tauri/target/release/bundle/appimage/*.AppImage
-            src-tauri/target/release/bundle/deb/*.deb
-          if-no-files-found: error
-
   macos:
     name: Universal macOS DMG
     needs: test
@@ -91,36 +63,10 @@ jobs:
           path: src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
           if-no-files-found: error
 
-  ios:
-    name: Unsigned iOS IPA
-    needs: test
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-apple-ios
-      - uses: swatinem/rust-cache@v2
-        with:
-          workspaces: "./src-tauri -> target"
-      - run: brew install cocoapods xcodegen libimobiledevice
-      - run: npm ci
-      - run: npm run ios:init -- --ci
-      - run: npm run ios:build -- --target aarch64 --no-sign --ci
-      - uses: actions/upload-artifact@v7
-        with:
-          name: prompt-contribution-graph-ios-unsigned
-          path: src-tauri/gen/apple/build/arm64/Prompt Contribution Graph.ipa
-          if-no-files-found: error
-
   release:
     name: Publish GitHub prerelease
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [linux, macos, ios]
+    needs: macos
     runs-on: ubuntu-22.04
     permissions:
       contents: write

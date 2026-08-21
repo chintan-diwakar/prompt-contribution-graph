@@ -4,23 +4,23 @@ Status: Migration complete; v0.2.0 prerelease published
 
 Completed: August 21, 2026
 
-This document records the Electron-to-Tauri 2 migration and its compatibility requirements. The implementation also includes an iOS target.
+This document records the Electron-to-Tauri 2 migration and its compatibility requirements. Distribution is scoped to macOS.
 
 The public project name changed from PromptTrail to Prompt Contribution Graph. Legacy identifiers will remain during this migration to preserve existing installations.
 
 ## Scope completion
 
-The Electron-to-Tauri migration and iOS build scope is complete:
+The Electron-to-Tauri macOS migration scope is complete:
 
 - [x] Replace the Electron desktop process and preload bridge with Tauri 2.
 - [x] Preserve the existing SQLite database, legacy paths, and rollback compatibility.
 - [x] Move hook capture, hook installation, queries, and desktop integrations into Rust.
-- [x] Keep one frontend for the browser dashboard, Tauri desktop app, and iOS app.
+- [x] Keep one frontend for the browser dashboard and Tauri desktop app.
 - [x] Preserve private aggregate-image sharing without screen-capture permission.
-- [x] Add macOS and Linux packaging plus an unsigned iOS IPA build to CI.
-- [x] Generate and validate native macOS and iOS artifacts locally.
+- [x] Add universal Intel and Apple silicon macOS packaging to CI.
+- [x] Generate and validate the universal macOS artifact locally and in CI.
 
-Apple distribution credentials, macOS notarization, and App Store/TestFlight publication are release operations rather than migration implementation. They remain pending for a stable Apple distribution.
+Developer ID credentials and macOS notarization remain pending for a stable Apple distribution. IPA and Linux installers are outside the release scope.
 
 ## Why migrate
 
@@ -51,7 +51,6 @@ Tauri uses the native webview of each operating system. It does not package a br
 - Keep the hook capture path below the five-second hook timeout.
 - Preserve the activity view, history view, insights, and private sharing.
 - Build Intel and Apple silicon DMGs.
-- Build an x64 AppImage and an x64 Ubuntu `.deb` package.
 - Keep the command-line dashboard available during the transition.
 
 ## Non-goals
@@ -89,8 +88,6 @@ src-tauri/src/lib.rs       Tauri commands, window lifecycle, and sharing
 src/                       Transitional Node CLI and browser server
 src/public/                Shared HTML, CSS, and JavaScript interface
 ```
-
-The iOS build uses the same Rust queries and frontend. It stores data in the application sandbox and does not expose desktop hook installation, because iOS cannot execute host-machine Claude Code hooks.
 
 ### Rust core
 
@@ -226,11 +223,10 @@ The application behavior must remain unchanged in this phase.
 ### Phase 6: Build and release — prerelease complete, notarized distribution pending
 
 1. Add Rust formatting, lint, and test jobs to CI.
-2. Build Linux packages on Ubuntu.
-3. Build Intel and Apple silicon DMGs on macOS.
-4. Record artifact sizes for every build.
-5. Sign and notarize the macOS release.
-6. Publish a preview release before the stable release.
+2. Build one universal Intel and Apple silicon DMG on macOS.
+3. Record the artifact size for every build.
+4. Sign and notarize the macOS release.
+5. Publish a preview release before the stable release.
 
 ## Acceptance gates
 
@@ -255,7 +251,7 @@ The application behavior must remain unchanged in this phase.
 ### Gate 4: Interface parity
 
 - Activity totals and streaks match the Node.js implementation.
-- Search, filters, deletion, history, insights, and sharing work on Linux and macOS.
+- Search, filters, deletion, history, insights, and sharing work on macOS.
 - Keyboard navigation and reduced-motion behavior remain available.
 
 ### Gate 5: Privacy
@@ -269,11 +265,10 @@ The application behavior must remain unchanged in this phase.
 
 | Risk | Control |
 | --- | --- |
-| Linux webview differences | Test the supported Ubuntu versions and document required system packages. |
 | SQLite incompatibility | Use fixture tests, additive migrations, transactions, and a backup. |
 | Slow hook startup | Enter capture mode before Tauri initialization and measure every build. |
 | macOS share differences | Keep a save-and-copy fallback for every Mac release. |
-| Visual differences | Use screenshot comparisons on Linux and macOS. |
+| Visual differences | Use macOS interface comparisons without requiring screen-recording permission. |
 | Signing delay | Keep preview builds separate from stable signed releases. |
 | Rollback failure | Preserve the old schema and keep the Electron downloads available. |
 
