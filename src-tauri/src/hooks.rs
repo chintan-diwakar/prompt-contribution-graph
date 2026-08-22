@@ -126,7 +126,7 @@ fn install_at(
     command: &str,
     description: Option<&str>,
 ) -> Result<bool, String> {
-    let mut settings = read_settings(&path)?;
+    let mut settings = read_settings(path)?;
     if !settings.is_object() {
         return Err("The hooks file must contain a JSON object.".to_string());
     }
