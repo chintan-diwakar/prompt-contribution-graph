@@ -85,6 +85,7 @@ export function openDatabase(options = {}) {
     CREATE TABLE IF NOT EXISTS prompts (
       id TEXT PRIMARY KEY,
       session_id TEXT NOT NULL,
+      agent TEXT NOT NULL DEFAULT 'claude',
       prompt TEXT NOT NULL,
       project_path TEXT NOT NULL,
       project_name TEXT NOT NULL,
@@ -100,6 +101,7 @@ export function openDatabase(options = {}) {
   addMissingColumn(database, 'prompts', 'response_status', "TEXT NOT NULL DEFAULT 'pending'");
   addMissingColumn(database, 'prompts', 'response_error', 'TEXT');
   addMissingColumn(database, 'prompts', 'completed_at', 'INTEGER');
+  addMissingColumn(database, 'prompts', 'agent', "TEXT NOT NULL DEFAULT 'claude'");
   database.exec(`
     CREATE TABLE IF NOT EXISTS tool_events (
       id TEXT PRIMARY KEY,
@@ -128,6 +130,7 @@ export function openDatabase(options = {}) {
       const row = {
         id: input.id || randomUUID(),
         sessionId: input.sessionId || 'unknown',
+        agent: input.agent === 'codex' ? 'codex' : 'claude',
         prompt: String(input.prompt),
         projectPath: input.projectPath || '',
         projectName: input.projectName || path.basename(input.projectPath || '') || 'Unknown project',
@@ -140,11 +143,12 @@ export function openDatabase(options = {}) {
       };
       database.prepare(`
         INSERT INTO prompts (
-          id, session_id, prompt, project_path, project_name, transcript_path, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+          id, session_id, agent, prompt, project_path, project_name, transcript_path, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
         row.id,
         row.sessionId,
+        row.agent,
         row.prompt,
         row.projectPath,
         row.projectName,
@@ -157,10 +161,10 @@ export function openDatabase(options = {}) {
     completeLatestPrompt(input) {
       const latest = database.prepare(`
         SELECT id FROM prompts
-        WHERE session_id = ?
+        WHERE session_id = ? AND agent = ?
         ORDER BY created_at DESC
         LIMIT 1
-      `).get(input.sessionId || 'unknown');
+      `).get(input.sessionId || 'unknown', input.agent === 'codex' ? 'codex' : 'claude');
       if (!latest) return null;
       const completedAt = input.completedAt ?? Date.now();
       database.prepare(`
@@ -180,10 +184,10 @@ export function openDatabase(options = {}) {
     insertToolEvent(input) {
       const latest = database.prepare(`
         SELECT id FROM prompts
-        WHERE session_id = ?
+        WHERE session_id = ? AND agent = ?
         ORDER BY created_at DESC
         LIMIT 1
-      `).get(input.sessionId || 'unknown');
+      `).get(input.sessionId || 'unknown', input.agent === 'codex' ? 'codex' : 'claude');
       if (!latest) return null;
       const row = {
         id: input.id || randomUUID(),
@@ -260,7 +264,7 @@ export function openDatabase(options = {}) {
       const safeOffset = Math.max(Number(offset) || 0, 0);
       const rows = database.prepare(`
         SELECT id, session_id, prompt, project_path, project_name, transcript_path, created_at,
-               response, response_status, response_error, completed_at
+               response, response_status, response_error, completed_at, agent
         FROM prompts
         ${where}
         ORDER BY created_at DESC
@@ -289,6 +293,7 @@ export function openDatabase(options = {}) {
           return {
             id: row.id,
             sessionId: row.session_id,
+            agent: row.agent,
             prompt: row.prompt,
             projectPath: row.project_path,
             projectName: row.project_name,

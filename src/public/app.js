@@ -159,6 +159,7 @@ function createPromptCard(prompt) {
   const responseExpand = card.querySelector('.response-expand');
   const responseEmpty = card.querySelector('.response-empty');
   const responseState = card.querySelector('.response-state');
+  const responseAgent = card.querySelector('.response-agent');
   const toolsDetails = card.querySelector('.tools-details');
   const toolsSummary = card.querySelector('.tools-summary-text');
   const toolList = card.querySelector('.tool-list');
@@ -173,6 +174,7 @@ function createPromptCard(prompt) {
   content.textContent = prompt.prompt;
   session.textContent = `Session ${prompt.sessionId.slice(0, 8)}`;
   turnDuration.textContent = prompt.durationMs === null ? '' : `Response ${formatDuration(prompt.durationMs)}`;
+  responseAgent.textContent = prompt.agent === 'codex' ? 'Codex' : 'Claude';
 
   if (prompt.response) {
     responseDetails.hidden = false;
@@ -184,7 +186,7 @@ function createPromptCard(prompt) {
     responseDetails.hidden = true;
     responseEmpty.hidden = false;
     responseEmpty.textContent = prompt.responseStatus === 'failed'
-      ? (prompt.responseError || 'Claude stopped with an error.')
+      ? (prompt.responseError || `${responseAgent.textContent} stopped with an error.`)
       : 'No response captured.';
   }
   responseState.textContent = prompt.responseStatus === 'completed'
@@ -344,7 +346,7 @@ async function loadPrompts({ reset = false } = {}) {
     empty.className = 'empty-row';
     empty.textContent = state.query || state.project
       ? 'No prompts match these filters.'
-      : 'No prompts yet. Submit a prompt in Claude Code to start your contribution graph.';
+      : 'No prompts yet. Submit a prompt in Claude Code or Codex to start your contribution graph.';
     elements.list.append(empty);
   }
   elements.resultCount.textContent = `${state.total.toLocaleString()} ${state.total === 1 ? 'prompt' : 'prompts'}`;

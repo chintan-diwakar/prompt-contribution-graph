@@ -25,6 +25,7 @@ test('saves a Claude Code UserPromptSubmit event', (t) => {
   assert.deepEqual(result.items[0], {
     id: result.items[0].id,
     sessionId: 'session-123',
+    agent: 'claude',
     prompt: 'Create a contribution chart',
     projectPath: '/work/my-project',
     projectName: 'my-project',
@@ -38,6 +39,54 @@ test('saves a Claude Code UserPromptSubmit event', (t) => {
     tools: [],
     toolSummary: { count: 0, failed: 0, durationMs: 0, filesChanged: 0 },
   });
+});
+
+test('saves Codex lifecycle events as Codex activity', (t) => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'prompttrail-codex-capture-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const database = openDatabase({ databasePath: path.join(directory, 'test.sqlite') });
+  t.after(() => database.close());
+
+  saveHookEvent({
+    hook_event_name: 'UserPromptSubmit',
+    session_id: 'codex-session',
+    prompt: 'A Claude prompt with the same session id',
+    cwd: '/work/claude-project',
+  }, { database, createdAt: 50 });
+
+  saveHookEvent({
+    hook_event_name: 'UserPromptSubmit',
+    session_id: 'codex-session',
+    turn_id: 'turn-1',
+    prompt: 'Add Codex support',
+    cwd: '/work/codex-project',
+    transcript_path: '/tmp/codex-rollout.jsonl',
+  }, { database, source: 'codex', createdAt: 100 });
+  saveHookEvent({
+    hook_event_name: 'PostToolUse',
+    session_id: 'codex-session',
+    turn_id: 'turn-1',
+    tool_use_id: 'codex-tool-1',
+    tool_name: 'Bash',
+    tool_input: { command: 'printf private-value' },
+    tool_response: { content: 'private-output' },
+  }, { database, source: 'codex', createdAt: 150 });
+  saveHookEvent({
+    hook_event_name: 'Stop',
+    session_id: 'codex-session',
+    turn_id: 'turn-1',
+    last_assistant_message: 'Codex support is ready.',
+  }, { database, source: 'codex', createdAt: 200 });
+
+  const prompts = database.listPrompts().items;
+  const prompt = prompts.find((item) => item.agent === 'codex');
+  assert.equal(prompt.agent, 'codex');
+  assert.equal(prompt.response, 'Codex support is ready.');
+  assert.equal(prompt.transcriptPath, '/tmp/codex-rollout.jsonl');
+  assert.equal(prompt.tools.length, 1);
+  assert.equal(JSON.stringify(prompt).includes('private-value'), false);
+  assert.equal(JSON.stringify(prompt).includes('private-output'), false);
+  assert.equal(prompts.find((item) => item.agent === 'claude').responseStatus, 'pending');
 });
 
 test('saves the final response and safe tool metadata', (t) => {

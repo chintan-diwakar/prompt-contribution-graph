@@ -37,10 +37,11 @@ fn safe_tool_target(event: &Value) -> Option<String> {
     input.get(key).and_then(Value::as_str).map(str::to_string)
 }
 
-pub fn save_hook_event(connection: &Connection, event: &Value) -> Result<(), String> {
+pub fn save_hook_event(connection: &Connection, event: &Value, source: &str) -> Result<(), String> {
     let event_name = string_value(event, "hook_event_name")
         .ok_or("The hook input does not contain an event name.")?;
     let session_id = string_value(event, "session_id").unwrap_or("unknown");
+    let agent = if source == "codex" { "codex" } else { "claude" };
     let created_at = now_ms();
 
     match event_name {
@@ -52,17 +53,17 @@ pub fn save_hook_event(connection: &Connection, event: &Value) -> Result<(), Str
             connection
                 .execute(
                     "INSERT INTO prompts (
-                        id, session_id, prompt, project_path, project_name, transcript_path, created_at
-                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                        id, session_id, agent, prompt, project_path, project_name, transcript_path, created_at
+                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
                     params![
-                        Uuid::new_v4().to_string(), session_id, prompt, project_path,
+                        Uuid::new_v4().to_string(), session_id, agent, prompt, project_path,
                         local_project_name(project_path), string_value(event, "transcript_path"), created_at
                     ],
                 )
                 .map_err(|error| error.to_string())?;
         }
         "Stop" | "StopFailure" => {
-            let Some(prompt_id) = latest_prompt_id(connection, session_id)? else {
+            let Some(prompt_id) = latest_prompt_id(connection, session_id, agent)? else {
                 return Ok(());
             };
             let failed = event_name == "StopFailure";
@@ -93,7 +94,7 @@ pub fn save_hook_event(connection: &Connection, event: &Value) -> Result<(), Str
                 .ok_or("The hook input does not contain tool metadata.")?;
             let tool_use_id = string_value(event, "tool_use_id")
                 .ok_or("The hook input does not contain tool metadata.")?;
-            let Some(prompt_id) = latest_prompt_id(connection, session_id)? else {
+            let Some(prompt_id) = latest_prompt_id(connection, session_id, agent)? else {
                 return Ok(());
             };
             connection
@@ -131,7 +132,7 @@ pub fn save_hook_event(connection: &Connection, event: &Value) -> Result<(), Str
     Ok(())
 }
 
-pub fn capture_from_stdin() -> Result<(), String> {
+pub fn capture_from_stdin(source: &str) -> Result<(), String> {
     let mut bytes = Vec::new();
     io::stdin()
         .take(MAX_EVENT_BYTES + 1)
@@ -143,7 +144,7 @@ pub fn capture_from_stdin() -> Result<(), String> {
     let event: Value = serde_json::from_slice(&bytes).map_err(|error| error.to_string())?;
     let database_path = crate::database::legacy_database_path()?;
     let connection = open_database(&database_path)?;
-    save_hook_event(&connection, &event)
+    save_hook_event(&connection, &event, source)
 }
 
 #[cfg(test)]
@@ -157,6 +158,7 @@ mod tests {
         connection.execute_batch(
             "CREATE TABLE prompts (
                 id TEXT PRIMARY KEY, session_id TEXT NOT NULL, prompt TEXT NOT NULL,
+                agent TEXT NOT NULL DEFAULT 'claude',
                 project_path TEXT NOT NULL, project_name TEXT NOT NULL, transcript_path TEXT,
                 created_at INTEGER NOT NULL, response TEXT,
                 response_status TEXT NOT NULL DEFAULT 'pending', response_error TEXT, completed_at INTEGER
@@ -174,6 +176,7 @@ mod tests {
                 "hook_event_name": "UserPromptSubmit", "session_id": "one",
                 "prompt": "Update the file", "cwd": "/work/project"
             }),
+            "codex",
         )
         .unwrap();
         save_hook_event(
@@ -183,6 +186,7 @@ mod tests {
                 "tool_name": "Bash", "tool_input": { "command": "echo private-value" },
                 "tool_response": { "content": "private-output" }
             }),
+            "codex",
         )
         .unwrap();
         let page = list_prompts(&connection, 50, 0, "", "").unwrap();
@@ -190,5 +194,6 @@ mod tests {
         assert!(!encoded.contains("private-value"));
         assert!(!encoded.contains("private-output"));
         assert_eq!(page.items[0].tools[0].target, None);
+        assert_eq!(page.items[0].agent, "codex");
     }
 }

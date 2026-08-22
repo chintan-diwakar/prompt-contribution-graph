@@ -77,6 +77,7 @@ test('migrates an existing prompt database without data loss', (t) => {
   const prompt = database.listPrompts().items[0];
   assert.equal(prompt.id, 'old-id');
   assert.equal(prompt.prompt, 'Old prompt');
+  assert.equal(prompt.agent, 'claude');
   assert.equal(prompt.responseStatus, 'pending');
   assert.deepEqual(prompt.tools, []);
 });

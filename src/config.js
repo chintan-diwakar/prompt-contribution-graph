@@ -32,3 +32,10 @@ export function getClaudeSettingsPath(env = process.env) {
     : path.join(os.homedir(), '.claude');
   return path.join(claudeDirectory, 'settings.json');
 }
+
+export function getCodexHooksPath(env = process.env) {
+  const codexDirectory = env.CODEX_HOME
+    ? path.resolve(env.CODEX_HOME)
+    : path.join(os.homedir(), '.codex');
+  return path.join(codexDirectory, 'hooks.json');
+}

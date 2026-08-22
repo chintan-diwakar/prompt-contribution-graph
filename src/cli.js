@@ -1,12 +1,19 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
 import { DEFAULT_PORT, DISPLAY_NAME, getDatabasePath } from './config.js';
-import { getHookStatus, installHook, uninstallHook } from './hooks.js';
+import {
+  getCodexHookStatus,
+  getHookStatus,
+  installCodexHooks,
+  installHook,
+  uninstallCodexHooks,
+  uninstallHook,
+} from './hooks.js';
 
-const HELP = `${DISPLAY_NAME} — local prompt history for Claude Code
+const HELP = `${DISPLAY_NAME} — local prompt history for Claude Code and Codex
 
 Usage:
-  prompttrail install              Install the Claude Code hook
+  prompttrail install              Install the Claude Code and Codex hooks
   prompttrail start [--port 4317]  Start the local dashboard
   prompttrail status               Show the hook and database status
   prompttrail uninstall            Remove only the ${DISPLAY_NAME} hook
@@ -50,7 +57,7 @@ async function main() {
   if (command === 'capture') {
     try {
       const { captureFromStandardInput } = await importDatabaseModule('./capture.js');
-      await captureFromStandardInput();
+      await captureFromStandardInput({ source: argumentValue(argumentsList, '--source', 'claude') });
     } catch (error) {
       process.stderr.write(`${DISPLAY_NAME} capture error: ${error.message}\n`);
     }
@@ -59,28 +66,36 @@ async function main() {
   }
 
   if (command === 'install') {
-    const result = installHook();
-    console.log(result.changed ? `${DISPLAY_NAME} installed the Claude Code hooks.` : `The ${DISPLAY_NAME} hooks are already installed.`);
-    console.log(`Settings: ${result.settingsPath}`);
+    const claude = installHook();
+    const codex = installCodexHooks();
+    console.log(claude.changed ? `${DISPLAY_NAME} installed the Claude Code hooks.` : 'Claude Code hooks are already installed.');
+    console.log(codex.changed ? `${DISPLAY_NAME} installed the Codex hooks.` : 'Codex hooks are already installed.');
+    console.log(`Claude settings: ${claude.settingsPath}`);
+    console.log(`Codex hooks: ${codex.settingsPath}`);
+    console.log('In Codex, run `/hooks` once to review and trust the installed hooks.');
     console.log('Run `prompttrail start` to open the dashboard.');
     return;
   }
 
   if (command === 'uninstall') {
-    const result = uninstallHook();
-    console.log(result.changed ? `${DISPLAY_NAME} removed the Claude Code hooks.` : `The ${DISPLAY_NAME} hooks are not installed.`);
+    const claude = uninstallHook();
+    const codex = uninstallCodexHooks();
+    console.log(claude.changed ? `${DISPLAY_NAME} removed the Claude Code hooks.` : 'Claude Code hooks are not installed.');
+    console.log(codex.changed ? `${DISPLAY_NAME} removed the Codex hooks.` : 'Codex hooks are not installed.');
     console.log('Your prompt database was not deleted.');
     return;
   }
 
   if (command === 'status') {
     const { openDatabase } = await importDatabaseModule('./database.js');
-    const hook = getHookStatus();
+    const claude = getHookStatus();
+    const codex = getCodexHookStatus();
     const database = openDatabase();
     const summary = database.getSummary();
     database.close();
-    const hookState = hook.installed ? 'installed' : hook.installedEvents.length ? 'partially installed' : 'not installed';
-    console.log(`Hooks: ${hookState}`);
+    const state = (hook) => hook.installed ? 'installed' : hook.installedEvents.length ? 'partially installed' : 'not installed';
+    console.log(`Claude Code hooks: ${state(claude)}`);
+    console.log(`Codex hooks: ${state(codex)}`);
     console.log(`Prompts: ${summary.total}`);
     console.log(`Database: ${getDatabasePath()}`);
     return;
