@@ -1,6 +1,6 @@
 [package]
 name = "prompt-contribution-graph"
-version = "0.2.0"
+version = "0.3.0"
 description = "Track daily prompt contributions across CLI coding agents"
 authors = ["Chintan Diwakar"]
 edition = "2021"

@@ -92,7 +92,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    name: Publish GitHub prerelease
+    name: Publish GitHub release
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [macos, linux]
     runs-on: ubuntu-22.04
@@ -108,7 +108,7 @@ jobs:
         shell: bash
         run: |
           find release-artifacts -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > release-artifacts/SHA256SUMS
-      - name: Publish prerelease
+      - name: Publish release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -117,6 +117,5 @@ jobs:
           gh release create "$GITHUB_REF_NAME" "${release_files[@]}" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Prompt Contribution Graph $GITHUB_REF_NAME" \
-            --notes-file docs/RELEASE_NOTES_V0.2.0.md \
-            --prerelease \
+            --notes-file docs/RELEASE_NOTES_V0.3.0.md \
             --verify-tag
