@@ -1,6 +1,6 @@
 {
   "name": "prompttrail",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Track your daily prompt contributions across CLI coding agents",
   "homepage": "https://github.com/chintan-diwakar/prompt-contribution-graph",
   "repository": {

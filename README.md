@@ -16,7 +16,7 @@
 </div>
 
 > [!NOTE]
-> The current development version supports Claude Code and Codex. Prompt Contribution Graph is an unofficial community project that is not affiliated with Anthropic or OpenAI.
+> The current release supports Claude Code and Codex. Prompt Contribution Graph is an unofficial community project that is not affiliated with Anthropic or OpenAI.
 
 ![Prompt Contribution Graph dashboard with daily insight, streaks, prompt totals, and a contribution chart](docs/prompttrail-activity.png)
 
