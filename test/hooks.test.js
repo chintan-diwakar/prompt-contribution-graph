@@ -3,7 +3,18 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { createDesktopHookCommand, createHookCommand, getHookStatus, HOOK_EVENTS, installHook, uninstallHook } from '../src/hooks.js';
+import {
+  CODEX_HOOK_EVENTS,
+  createDesktopHookCommand,
+  createHookCommand,
+  getCodexHookStatus,
+  getHookStatus,
+  HOOK_EVENTS,
+  installCodexHooks,
+  installHook,
+  uninstallCodexHooks,
+  uninstallHook,
+} from '../src/hooks.js';
 
 function temporarySettings(t, initial) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'prompttrail-hooks-'));
@@ -93,7 +104,7 @@ test('quotes paths in the generated hook command', () => {
     platform: 'linux',
   });
   assert.match(command, /^'\/path with space\/node' --no-warnings '\/project\/prompt trail\/cli.js' capture/);
-  assert.match(command, /--hook-id prompttrail-local-v1$/);
+  assert.match(command, /--source claude --hook-id prompttrail-local-v1$/);
 });
 
 test('creates a packaged desktop hook command', () => {
@@ -101,5 +112,35 @@ test('creates a packaged desktop hook command', () => {
     executablePath: '/Applications/Prompt Contribution Graph.app/Contents/MacOS/Prompt Contribution Graph',
     platform: 'darwin',
   });
-  assert.equal(command, "'/Applications/Prompt Contribution Graph.app/Contents/MacOS/Prompt Contribution Graph' --capture-hook --hook-id prompttrail-local-v1");
+  assert.equal(command, "'/Applications/Prompt Contribution Graph.app/Contents/MacOS/Prompt Contribution Graph' --capture-hook --source claude --hook-id prompttrail-local-v1");
+});
+
+test('installs Codex hooks without replacing existing hooks', (t) => {
+  const settingsPath = temporarySettings(t, {
+    description: 'Existing Codex hooks',
+    hooks: {
+      Stop: [{ hooks: [{ type: 'command', command: 'existing-hook' }] }],
+    },
+  });
+  const command = 'node cli.js capture --source codex --hook-id prompttrail-local-v1';
+
+  assert.equal(installCodexHooks({ settingsPath, command }).changed, true);
+  assert.equal(installCodexHooks({ settingsPath, command }).changed, false);
+  const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  assert.equal(settings.description, 'Existing Codex hooks');
+  assert.equal(settings.hooks.Stop.length, 2);
+  assert.deepEqual(getCodexHookStatus({ settingsPath }).installedEvents, CODEX_HOOK_EVENTS);
+
+  assert.equal(uninstallCodexHooks({ settingsPath }).changed, true);
+  const remaining = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  assert.deepEqual(remaining.hooks.Stop, [{ hooks: [{ type: 'command', command: 'existing-hook' }] }]);
+});
+
+test('creates a packaged Codex hook command', () => {
+  const command = createDesktopHookCommand({
+    executablePath: '/Applications/Prompt Contribution Graph.app/Contents/MacOS/Prompt Contribution Graph',
+    platform: 'darwin',
+    source: 'codex',
+  });
+  assert.equal(command, "'/Applications/Prompt Contribution Graph.app/Contents/MacOS/Prompt Contribution Graph' --capture-hook --source codex --hook-id prompttrail-local-v1");
 });

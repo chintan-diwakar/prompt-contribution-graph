@@ -54,6 +54,7 @@ pub struct ToolSummary {
 pub struct Prompt {
     pub id: String,
     pub session_id: String,
+    pub agent: String,
     pub prompt: String,
     pub project_path: String,
     pub project_name: String,

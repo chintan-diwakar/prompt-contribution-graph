@@ -103,6 +103,7 @@ pub fn open_database(database_path: &Path) -> Result<Connection, String> {
             "CREATE TABLE IF NOT EXISTS prompts (
                 id TEXT PRIMARY KEY,
                 session_id TEXT NOT NULL,
+                agent TEXT NOT NULL DEFAULT 'claude',
                 prompt TEXT NOT NULL,
                 project_path TEXT NOT NULL,
                 project_name TEXT NOT NULL,
@@ -122,6 +123,7 @@ pub fn open_database(database_path: &Path) -> Result<Connection, String> {
         ("response_status", "TEXT NOT NULL DEFAULT 'pending'"),
         ("response_error", "TEXT"),
         ("completed_at", "INTEGER"),
+        ("agent", "TEXT NOT NULL DEFAULT 'claude'"),
     ];
     let missing: Vec<_> = additions
         .iter()
@@ -339,7 +341,7 @@ pub fn list_prompts(
     let safe_offset = offset.max(0);
     let sql = format!(
         "SELECT id, session_id, prompt, project_path, project_name, transcript_path, created_at,
-                response, response_status, response_error, completed_at
+                response, response_status, response_error, completed_at, agent
          FROM prompts {where_clause} ORDER BY created_at DESC LIMIT ? OFFSET ?"
     );
     let mut page_values = values;
@@ -362,6 +364,7 @@ pub fn list_prompts(
                 row.get::<_, String>(8)?,
                 row.get::<_, Option<String>>(9)?,
                 row.get::<_, Option<i64>>(10)?,
+                row.get::<_, String>(11)?,
             ))
         })
         .map_err(|error| error.to_string())?
@@ -389,6 +392,7 @@ pub fn list_prompts(
         items.push(Prompt {
             id: row.0,
             session_id: row.1,
+            agent: row.11,
             prompt: row.2,
             project_path: row.3,
             project_name: row.4,
@@ -416,11 +420,12 @@ pub fn delete_prompt(connection: &Connection, id: &str) -> Result<bool, String> 
 pub fn latest_prompt_id(
     connection: &Connection,
     session_id: &str,
+    agent: &str,
 ) -> Result<Option<String>, String> {
     connection
         .query_row(
-            "SELECT id FROM prompts WHERE session_id = ?1 ORDER BY created_at DESC LIMIT 1",
-            [session_id],
+            "SELECT id FROM prompts WHERE session_id = ?1 AND agent = ?2 ORDER BY created_at DESC LIMIT 1",
+            [session_id, agent],
             |row| row.get(0),
         )
         .optional()
@@ -459,11 +464,11 @@ mod tests {
         let today = Local.with_ymd_and_hms(2026, 8, 13, 12, 0, 0).unwrap();
         let yesterday = Local.with_ymd_and_hms(2026, 8, 12, 12, 0, 0).unwrap();
         connection.execute(
-            "INSERT INTO prompts VALUES (?1, 'session', 'Today', '/work/alpha', 'alpha', NULL, ?2, NULL, 'pending', NULL, NULL)",
+            "INSERT INTO prompts VALUES (?1, 'session', 'claude', 'Today', '/work/alpha', 'alpha', NULL, ?2, NULL, 'pending', NULL, NULL)",
             rusqlite::params!["today", today.timestamp_millis()],
         ).unwrap();
         connection.execute(
-            "INSERT INTO prompts VALUES (?1, 'session', 'Yesterday', '/work/alpha', 'alpha', NULL, ?2, 'Done', 'completed', NULL, ?3)",
+            "INSERT INTO prompts VALUES (?1, 'session', 'claude', 'Yesterday', '/work/alpha', 'alpha', NULL, ?2, 'Done', 'completed', NULL, ?3)",
             rusqlite::params!["yesterday", yesterday.timestamp_millis(), yesterday.timestamp_millis() + 500],
         ).unwrap();
         connection.execute(
@@ -479,6 +484,7 @@ mod tests {
         let prompts = list_prompts(&connection, 50, 0, "Done", "alpha").unwrap();
         assert_eq!(prompts.total, 1);
         assert_eq!(prompts.items[0].tools.len(), 1);
+        assert_eq!(prompts.items[0].agent, "claude");
         assert_eq!(prompts.items[0].tool_summary.files_changed, 1);
 
         drop(connection);
@@ -505,6 +511,7 @@ mod tests {
         let page = list_prompts(&migrated, 50, 0, "", "").unwrap();
         assert_eq!(page.items[0].id, "old");
         assert_eq!(page.items[0].response_status, "pending");
+        assert_eq!(page.items[0].agent, "claude");
         drop(migrated);
         let backups = fs::read_dir(&directory)
             .unwrap()

@@ -153,10 +153,19 @@ fn share_activity(
 }
 
 pub fn capture_mode_from_args() -> bool {
-    if !std::env::args().any(|argument| argument == "--capture-hook") {
+    let arguments: Vec<String> = std::env::args().collect();
+    if !arguments
+        .iter()
+        .any(|argument| argument == "--capture-hook")
+    {
         return false;
     }
-    if let Err(error) = capture::capture_from_stdin() {
+    let source = arguments
+        .windows(2)
+        .find(|pair| pair[0] == "--source")
+        .map(|pair| pair[1].as_str())
+        .unwrap_or("claude");
+    if let Err(error) = capture::capture_from_stdin(source) {
         eprintln!("Prompt Contribution Graph capture error: {error}");
     }
     print!("{{}}");
@@ -183,7 +192,9 @@ pub fn run() {
             if !cfg!(debug_assertions) {
                 if let Ok(executable) = hook_executable_path() {
                     if let Err(error) = hooks::install(&executable) {
-                        eprintln!("Prompt Contribution Graph hook install error: {error}");
+                        eprintln!(
+                            "Prompt Contribution Graph coding-agent hook install error: {error}"
+                        );
                     }
                 }
             }

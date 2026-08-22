@@ -4,18 +4,18 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 pub const HOOK_ID: &str = "prompttrail-local-v1";
-pub const HOOK_EVENTS: [&str; 5] = [
+pub const CLAUDE_HOOK_EVENTS: [&str; 5] = [
     "UserPromptSubmit",
     "Stop",
     "StopFailure",
     "PostToolUse",
     "PostToolUseFailure",
 ];
+pub const CODEX_HOOK_EVENTS: [&str; 3] = ["UserPromptSubmit", "Stop", "PostToolUse"];
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct HookStatus {
-    pub supported: bool,
+pub struct AgentHookStatus {
     pub installed: bool,
     pub installed_events: Vec<String>,
     pub missing_events: Vec<String>,
@@ -24,19 +24,40 @@ pub struct HookStatus {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct HookStatus {
+    pub supported: bool,
+    pub installed: bool,
+    pub claude: AgentHookStatus,
+    pub codex: AgentHookStatus,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct HookInstallResult {
     pub supported: bool,
     pub changed: bool,
-    pub settings_path: Option<String>,
+    pub claude_changed: bool,
+    pub codex_changed: bool,
+    pub claude_settings_path: Option<String>,
+    pub codex_settings_path: Option<String>,
 }
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-fn settings_path() -> Result<PathBuf, String> {
+fn claude_settings_path() -> Result<PathBuf, String> {
     let directory = std::env::var_os("CLAUDE_CONFIG_DIR")
         .map(PathBuf::from)
         .or_else(|| dirs::home_dir().map(|home| home.join(".claude")))
         .ok_or("Could not find the Claude configuration directory.")?;
     Ok(directory.join("settings.json"))
+}
+
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+fn codex_hooks_path() -> Result<PathBuf, String> {
+    let directory = std::env::var_os("CODEX_HOME")
+        .map(PathBuf::from)
+        .or_else(|| dirs::home_dir().map(|home| home.join(".codex")))
+        .ok_or("Could not find the Codex configuration directory.")?;
+    Ok(directory.join("hooks.json"))
 }
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
@@ -48,10 +69,10 @@ fn quote_command_part(path: &Path) -> String {
 }
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-fn hook_command(executable: &Path) -> String {
+fn hook_command(executable: &Path, source: &str) -> String {
     format!(
-        "{} --capture-hook --hook-id {HOOK_ID}",
-        quote_command_part(executable)
+        "{} --capture-hook --source {source} --hook-id {HOOK_ID}",
+        quote_command_part(executable),
     )
 }
 
@@ -99,11 +120,22 @@ fn write_settings(path: &Path, settings: &Value) -> Result<(), String> {
 }
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-pub fn install(executable: &Path) -> Result<HookInstallResult, String> {
-    let path = settings_path()?;
-    let mut settings = read_settings(&path)?;
+fn install_at(
+    path: &Path,
+    events: &[&str],
+    command: &str,
+    description: Option<&str>,
+) -> Result<bool, String> {
+    let mut settings = read_settings(path)?;
     if !settings.is_object() {
-        return Err("Claude settings must contain a JSON object.".to_string());
+        return Err("The hooks file must contain a JSON object.".to_string());
+    }
+    if let Some(description) = description {
+        settings
+            .as_object_mut()
+            .unwrap()
+            .entry("description")
+            .or_insert_with(|| Value::String(description.to_string()));
     }
     let hooks = settings
         .as_object_mut()
@@ -111,15 +143,14 @@ pub fn install(executable: &Path) -> Result<HookInstallResult, String> {
         .entry("hooks")
         .or_insert_with(|| json!({}));
     if !hooks.is_object() {
-        return Err("The hooks field in Claude settings must contain an object.".to_string());
+        return Err("The hooks field must contain a JSON object.".to_string());
     }
-    let command = hook_command(executable);
     let mut changed = false;
-    for event in HOOK_EVENTS {
+    for event in events {
         let groups = hooks
             .as_object_mut()
             .unwrap()
-            .entry(event)
+            .entry(*event)
             .or_insert_with(|| json!([]));
         let array = groups
             .as_array_mut()
@@ -134,8 +165,8 @@ pub fn install(executable: &Path) -> Result<HookInstallResult, String> {
                     continue;
                 }
                 found = true;
-                if hook.get("command").and_then(Value::as_str) != Some(command.as_str()) {
-                    hook["command"] = Value::String(command.clone());
+                if hook.get("command").and_then(Value::as_str) != Some(command) {
+                    hook["command"] = Value::String(command.to_string());
                     changed = true;
                 }
             }
@@ -149,12 +180,34 @@ pub fn install(executable: &Path) -> Result<HookInstallResult, String> {
         }
     }
     if changed {
-        write_settings(&path, &settings)?;
+        write_settings(path, &settings)?;
     }
+    Ok(changed)
+}
+
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+pub fn install(executable: &Path) -> Result<HookInstallResult, String> {
+    let claude_path = claude_settings_path()?;
+    let codex_path = codex_hooks_path()?;
+    let claude_changed = install_at(
+        &claude_path,
+        &CLAUDE_HOOK_EVENTS,
+        &hook_command(executable, "claude"),
+        None,
+    )?;
+    let codex_changed = install_at(
+        &codex_path,
+        &CODEX_HOOK_EVENTS,
+        &hook_command(executable, "codex"),
+        Some("Prompt Contribution Graph activity hooks for Codex."),
+    )?;
     Ok(HookInstallResult {
         supported: true,
-        changed,
-        settings_path: Some(path.to_string_lossy().into_owned()),
+        changed: claude_changed || codex_changed,
+        claude_changed,
+        codex_changed,
+        claude_settings_path: Some(claude_path.to_string_lossy().into_owned()),
+        codex_settings_path: Some(codex_path.to_string_lossy().into_owned()),
     })
 }
 
@@ -163,15 +216,17 @@ pub fn install(_executable: &Path) -> Result<HookInstallResult, String> {
     Ok(HookInstallResult {
         supported: false,
         changed: false,
-        settings_path: None,
+        claude_changed: false,
+        codex_changed: false,
+        claude_settings_path: None,
+        codex_settings_path: None,
     })
 }
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-pub fn status() -> Result<HookStatus, String> {
-    let path = settings_path()?;
-    let settings = read_settings(&path)?;
-    let installed_events: Vec<String> = HOOK_EVENTS
+fn status_at(path: &Path, events: &[&str]) -> Result<AgentHookStatus, String> {
+    let settings = read_settings(path)?;
+    let installed_events: Vec<String> = events
         .iter()
         .filter(|event| {
             settings["hooks"][**event].as_array().is_some_and(|groups| {
@@ -184,7 +239,7 @@ pub fn status() -> Result<HookStatus, String> {
         })
         .map(|event| (*event).to_string())
         .collect();
-    let missing_events = HOOK_EVENTS
+    let missing_events = events
         .iter()
         .filter(|event| {
             !installed_events
@@ -193,13 +248,65 @@ pub fn status() -> Result<HookStatus, String> {
         })
         .map(|event| (*event).to_string())
         .collect();
-    Ok(HookStatus {
-        supported: true,
-        installed: installed_events.len() == HOOK_EVENTS.len(),
+    Ok(AgentHookStatus {
+        installed: installed_events.len() == events.len(),
         installed_events,
         missing_events,
         settings_path: Some(path.to_string_lossy().into_owned()),
     })
+}
+
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
+pub fn status() -> Result<HookStatus, String> {
+    let claude = status_at(&claude_settings_path()?, &CLAUDE_HOOK_EVENTS)?;
+    let codex = status_at(&codex_hooks_path()?, &CODEX_HOOK_EVENTS)?;
+    Ok(HookStatus {
+        supported: true,
+        installed: claude.installed && codex.installed,
+        claude,
+        codex,
+    })
+}
+
+#[cfg(all(test, not(any(target_os = "android", target_os = "ios"))))]
+mod tests {
+    use super::*;
+    use uuid::Uuid;
+
+    #[test]
+    fn installs_codex_hooks_without_replacing_existing_hooks() {
+        let directory =
+            std::env::temp_dir().join(format!("prompttrail-codex-hooks-{}", Uuid::new_v4()));
+        let path = directory.join("hooks.json");
+        fs::create_dir_all(&directory).unwrap();
+        fs::write(
+            &path,
+            r#"{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"existing-hook"}]}]}}"#,
+        )
+        .unwrap();
+        let command = "'/Applications/Prompt Contribution Graph.app/Contents/MacOS/Prompt Contribution Graph' --capture-hook --source codex --hook-id prompttrail-local-v1";
+
+        assert!(install_at(
+            &path,
+            &CODEX_HOOK_EVENTS,
+            command,
+            Some("Prompt Contribution Graph activity hooks for Codex."),
+        )
+        .unwrap());
+        assert!(!install_at(
+            &path,
+            &CODEX_HOOK_EVENTS,
+            command,
+            Some("Prompt Contribution Graph activity hooks for Codex."),
+        )
+        .unwrap());
+        let settings = read_settings(&path).unwrap();
+        assert_eq!(settings["hooks"]["Stop"].as_array().unwrap().len(), 2);
+        assert!(status_at(&path, &CODEX_HOOK_EVENTS).unwrap().installed);
+        assert!(PathBuf::from(format!("{}.prompttrail.bak", path.to_string_lossy())).exists());
+
+        fs::remove_dir_all(directory).unwrap();
+    }
 }
 
 #[cfg(any(target_os = "android", target_os = "ios"))]
@@ -207,8 +314,17 @@ pub fn status() -> Result<HookStatus, String> {
     Ok(HookStatus {
         supported: false,
         installed: false,
-        installed_events: Vec::new(),
-        missing_events: Vec::new(),
-        settings_path: None,
+        claude: AgentHookStatus {
+            installed: false,
+            installed_events: Vec::new(),
+            missing_events: Vec::new(),
+            settings_path: None,
+        },
+        codex: AgentHookStatus {
+            installed: false,
+            installed_events: Vec::new(),
+            missing_events: Vec::new(),
+            settings_path: None,
+        },
     })
 }

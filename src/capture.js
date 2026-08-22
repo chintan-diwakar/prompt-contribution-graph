@@ -29,6 +29,7 @@ function safeToolTarget(event) {
 
 export function saveHookEvent(event, options = {}) {
   if (!event?.hook_event_name) throw new Error('The hook input does not contain an event name.');
+  const source = options.source === 'codex' ? 'codex' : 'claude';
 
   const database = options.database || openDatabase(options);
   const ownsDatabase = !options.database;
@@ -39,6 +40,7 @@ export function saveHookEvent(event, options = {}) {
       }
       return database.insertPrompt({
         sessionId: event.session_id,
+        agent: source,
         prompt: event.prompt,
         projectPath: event.cwd || '',
         projectName: path.basename(event.cwd || '') || 'Unknown project',
@@ -50,6 +52,7 @@ export function saveHookEvent(event, options = {}) {
     if (event.hook_event_name === 'Stop') {
       return database.completeLatestPrompt({
         sessionId: event.session_id,
+        agent: source,
         response: event.last_assistant_message,
         status: 'completed',
         completedAt: options.createdAt,
@@ -59,6 +62,7 @@ export function saveHookEvent(event, options = {}) {
     if (event.hook_event_name === 'StopFailure') {
       return database.completeLatestPrompt({
         sessionId: event.session_id,
+        agent: source,
         response: event.last_assistant_message,
         status: 'failed',
         error: event.error_details || event.error || 'unknown',
@@ -72,6 +76,7 @@ export function saveHookEvent(event, options = {}) {
       }
       return database.insertToolEvent({
         sessionId: event.session_id,
+        agent: source,
         toolUseId: event.tool_use_id,
         toolName: event.tool_name,
         status: event.hook_event_name === 'PostToolUse' ? 'success' : 'failed',
