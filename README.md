@@ -197,6 +197,10 @@ PROMPTTRAIL_HOME="$PWD/.prompttrail-data" npm start -- --no-open
 
 Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before you create a pull request.
 
+## Star history
+
+[![GitHub Star History Chart](https://api.star-history.com/svg?repos=chintan-diwakar/prompt-contribution-graph&type=Date)](https://www.star-history.com/#chintan-diwakar/prompt-contribution-graph&Date)
+
 ## License
 
 Prompt Contribution Graph uses the [MIT License](LICENSE).
