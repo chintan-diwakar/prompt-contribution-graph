@@ -199,7 +199,7 @@ Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before you cr
 
 ## Star history
 
-[![GitHub Star History Chart](https://api.star-history.com/svg?repos=chintan-diwakar/prompt-contribution-graph&type=Date)](https://www.star-history.com/#chintan-diwakar/prompt-contribution-graph&Date)
+[![Star History Chart](https://api.star-history.com/chart?repos=chintan-diwakar/prompt-contribution-graph&type=date&legend=top-left&sealed_token=-6z0yJ1Vfh-7yW0_FMBkPLjvaCKIBjfjvDiKq7XDowc0Qsg35FItGcZvD80FCziOTsqaY8ZTirTqib1I_5WXchMhIanshfbJpKMC4Au2oNa1ACk7qDNuJgGwRN9_d_-b6pRJRrOfMS8AJLip9OAkevRAmQXvxLZ3k0tP8jOS3xJ_IeA6w4M-I0mGcHZH)](https://www.star-history.com/?repos=chintan-diwakar%2Fprompt-contribution-graph&type=date&legend=top-left)
 
 ## License
 
