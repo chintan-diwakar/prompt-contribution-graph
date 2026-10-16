@@ -1,6 +1,6 @@
 [package]
 name = "prompt-contribution-graph"
-version = "0.3.0"
+version = "0.3.1"
 description = "Track daily prompt contributions across CLI coding agents"
 authors = ["Chintan Diwakar"]
 edition = "2021"
@@ -14,10 +14,10 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-base64 = "0.22"
+base64 = "0.23"
 chrono = { version = "0.4", features = ["clock"] }
 dirs = "6"
-rusqlite = { version = "0.37", features = ["bundled"] }
+rusqlite = { version = "0.40", features = ["bundled"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri = { version = "2", features = [] }
