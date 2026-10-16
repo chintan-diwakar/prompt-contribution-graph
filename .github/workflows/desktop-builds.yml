@@ -114,8 +114,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mapfile -d '' release_files < <(find release-artifacts -type f -print0)
+          notes_file="docs/RELEASE_NOTES_${GITHUB_REF_NAME}.md"
+          test -f "$notes_file"
           gh release create "$GITHUB_REF_NAME" "${release_files[@]}" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Prompt Contribution Graph $GITHUB_REF_NAME" \
-            --notes-file docs/RELEASE_NOTES_V0.3.0.md \
+            --notes-file "$notes_file" \
             --verify-tag
