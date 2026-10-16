@@ -114,8 +114,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mapfile -d '' release_files < <(find release-artifacts -type f -print0)
-          notes_file="docs/RELEASE_NOTES_${GITHUB_REF_NAME}.md"
-          test -f "$notes_file"
+          notes_file="docs/RELEASE_NOTES_V${GITHUB_REF_NAME#v}.md"
+          if [[ ! -f "$notes_file" ]]; then
+            echo "Missing release notes: $notes_file" >&2
+            exit 1
+          fi
           gh release create "$GITHUB_REF_NAME" "${release_files[@]}" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Prompt Contribution Graph $GITHUB_REF_NAME" \
